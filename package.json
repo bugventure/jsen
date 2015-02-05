@@ -1,0 +1,24 @@
+{
+  "name": "jsen",
+  "version": "0.0.1",
+  "description": "JSON-Schema validator built for speed.",
+  "author": "Veli Pehlivanov <bugventure@gmail.com>",
+  "homepage": "https://github.com/bugventure/jsen",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bugventure/jsen.git"
+  },
+  "bugs": "https://github.com/bugventure/jsen/issues",
+  "keywords": [
+    "JSON",
+    "schema",
+    "validator",
+    "speed"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "coverage": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls && rm -rf ./coverage"
+  }
+}
