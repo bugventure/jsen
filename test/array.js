@@ -71,31 +71,31 @@ describe('type: array', function () {
         assert(validate(['a']));
         assert(validate(['a', 'b', 'c']));
 
-        // schema = {
-        //     type: 'array',
-        //     items: {
-        //         type: 'object',
-        //         properties: {
-        //             strProp: { type: 'string' },
-        //             boolProp: { type: 'boolean' }
-        //         },
-        //         required: ['strProp']
-        //     }
-        // };
+        schema = {
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    strProp: { type: 'string' },
+                    boolProp: { type: 'boolean' }
+                },
+                required: ['strProp']
+            }
+        };
 
-        // validate = jsen(schema);
+        validate = jsen(schema);
 
-        // assert(!validate([123]));
-        // assert(!validate([{}]));
-        // assert(!validate([{
-        //     strProp: 'value',
-        //     boolProp: 123
-        // }]));
+        assert(!validate([123]));
+        assert(!validate([{}]));
+        assert(!validate([{
+            strProp: 'value',
+            boolProp: 123
+        }]));
 
-        // assert(validate([{
-        //     strProp: 'value',
-        //     boolProp: false
-        // }]));
+        assert(validate([{
+            strProp: 'value',
+            boolProp: false
+        }]));
     });
 
     it('items: array', function () {
