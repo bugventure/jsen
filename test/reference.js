@@ -6,40 +6,40 @@ var assert = require('assert'),
 
 describe('$ref', function () {
     it('throws if string is not in correct format', function () {
-        // assert.throws(function () {
-        //     jsen({ $ref: '' });
-        // });
+        assert.throws(function () {
+            jsen({ $ref: '' });
+        });
 
-        // assert.throws(function () {
-        //     jsen({ $ref: '#double//slash' });
-        // });
+        assert.throws(function () {
+            jsen({ $ref: '#double//slash' });
+        });
 
-        // assert.throws(function () {
-        //     jsen({ $ref: '#ends/with/slash/' });
-        // });
+        assert.throws(function () {
+            jsen({ $ref: '#ends/with/slash/' });
+        });
 
-        // assert.throws(function () {
-        //     // invalid reference, non-existent schema properties
-        //     jsen({ $ref: '#a/b/c' });
-        // });
+        assert.throws(function () {
+            // invalid reference, non-existent schema properties
+            jsen({ $ref: '#a/b/c' });
+        });
 
-        // assert.doesNotThrow(function () {
-        //     // schema resolves to itself
-        //     jsen({ $ref: '#' });
-        // });
+        assert.doesNotThrow(function () {
+            // schema resolves to itself
+            jsen({ $ref: '#' });
+        });
 
-        // assert.doesNotThrow(function () {
-        //     jsen({
-        //         a: {
-        //             b: {
-        //                 c: {
-        //                     type: 'any'
-        //                 }
-        //             }
-        //         },
-        //         $ref: '#/a/b/c'
-        //     });
-        // });
+        assert.doesNotThrow(function () {
+            jsen({
+                a: {
+                    b: {
+                        c: {
+                            type: 'any'
+                        }
+                    }
+                },
+                $ref: '#/a/b/c'
+            });
+        });
 
         assert.doesNotThrow(function () {
             jsen({
