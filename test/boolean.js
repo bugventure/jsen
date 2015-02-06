@@ -4,7 +4,7 @@
 var assert = require('assert'),
     jsen = require('../index.js');
 
-describe.skip('type: boolean', function () {
+describe('type: boolean', function () {
     it('required', function () {
         var schema = { type: 'boolean' },
             validate = jsen(schema);
