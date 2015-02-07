@@ -5,30 +5,43 @@ var fs = require('fs'),
     path = require('path'),
     assert = require('assert'),
     jsen = require('../index.js'),
-    dir = 'draft4-test-suite',
+    dir = 'draft4',
     files,
     testCategories = [],
     error,
+    excludedFiles = [
+        'refRemote',
+        'zeroTerminatedFloats'
+    ],
     excludedCases = [
         'two supplementary Unicode code points is long enough',
         'one supplementary Unicode code point is not long enough'
     ];
 
-try {
-    dir = path.resolve(__dirname, dir);
+function walk(dir) {
     files = fs.readdirSync(dir);
 
     files.forEach(function (filename) {
         var fullpath = path.resolve(dir, filename),
             stat = fs.statSync(fullpath);
 
-        if (stat.isFile() && path.extname(filename) === '.json') {
+        console.log(filename);
+
+        if (stat.isFile() && path.extname(filename) === '.json' &&
+            excludedFiles.indexOf(path.basename(filename, '.json')) < 0) {
             testCategories.push({
                 name: path.basename(filename, '.json'),
                 testGroups: require(fullpath)
             });
         }
+        else if (stat.isDirectory()) {
+            walk(path.resolve(dir, filename));
+        }
     });
+}
+
+try {
+    walk(path.resolve(__dirname, dir));
 }
 catch (e) {
     error = e;
