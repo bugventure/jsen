@@ -31,8 +31,8 @@ catch (e) {
 }
 
 // temporarily exclude remote ref tests
-// testCategories.splice(24, 1);
-testCategories = testCategories.slice(5, 6);
+testCategories.splice(23, 1);
+// testCategories = testCategories.slice(24, 25);
 
 function addTestCase(schema, testCase) {
     it(testCase.description, function () {
