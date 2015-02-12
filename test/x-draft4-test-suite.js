@@ -25,8 +25,6 @@ function walk(dir) {
         var fullpath = path.resolve(dir, filename),
             stat = fs.statSync(fullpath);
 
-        console.log(filename);
-
         if (stat.isFile() && path.extname(filename) === '.json' &&
             excludedFiles.indexOf(path.basename(filename, '.json')) < 0) {
             testCategories.push({
