@@ -30,6 +30,8 @@ jsen (JSON Sentinel) validates your JSON objects using [JSON-Schema](http://json
 - [Schema Reference Using `$ref`](#schema-reference-using-ref)
 - [Tests](#tests)
 - [Issues](#issues)
+- [Changelog](#changelog)
+    - [v0.0.3](#v003)
 - [License](#license)
 
 <!-- /MarkdownTOC -->
@@ -362,6 +364,13 @@ Source code coverage is provided by [istanbul][istanbul] and visible on [coveral
 ## Issues
 
 Please submit issues to the [jsen issue tracker in GitHub](https://github.com/bugventure/jsen/issues).
+
+## Changelog
+
+### v0.0.3
+
+* Optimize performance of runtime code generation
+* Optimize performance of generated code
 
 ## License
 
