@@ -86,6 +86,22 @@ isSchemaValid = validateSchema({
 // false, because properties is not in correct format
 ```
 
+By default, jsen simply returns `false` if a schema is invalid. If you would like more detail about which part of your schema failed, you can ask jsen to throw errors at you.
+
+```javascript
+var validateSchema = jsen({"$ref": "http://json-schema.org/draft-04/schema#"}, true);
+var isSchemaValid = validateSchema({ type: 'object' }); // true
+
+try {
+    validateSchema({
+        type: 'object',
+        properties: ['string', 'number']
+    });
+} catch (e) {
+    e.message === 'Invalid input for: {"type":"object","additionalProperties":{"$ref":"#"},"default":{}}' //true
+}
+```
+
 ## JSON Schema
 
 `jsen` fully implements draft 4 of the [JSON Schema specification](http://json-schema.org/documentation.html). Check out this [excellent guide to JSON Schema](http://spacetelescope.github.io/understanding-json-schema/UnderstandingJSONSchema.pdf) by Michael Droettboom, et al.
