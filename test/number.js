@@ -133,4 +133,11 @@ describe('type: number', function () {
 
         assert(validate(9.42)); // 3 * Math.PI
     });
+
+    it('fix multipleOf doesn\'t validate data for decimal point (#1)', function () {
+        var schema = { type: 'number', multipleOf: 0.01 },
+            validate = jsen(schema);
+
+        assert(validate(18.15));
+    });
 });
