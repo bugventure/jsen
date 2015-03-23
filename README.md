@@ -31,6 +31,7 @@ jsen (JSON Sentinel) validates your JSON objects using [JSON-Schema](http://json
 - [Tests](#tests)
 - [Issues](#issues)
 - [Changelog](#changelog)
+    - [v0.0.4](#v004)
     - [v0.0.3](#v003)
 - [License](#license)
 
@@ -366,6 +367,10 @@ Source code coverage is provided by [istanbul][istanbul] and visible on [coveral
 Please submit issues to the [jsen issue tracker in GitHub](https://github.com/bugventure/jsen/issues).
 
 ## Changelog
+
+### v0.0.4
+
+* Fix `multipleOf` doesn't validate data for decimal points (#1)
 
 ### v0.0.3
 
