@@ -23,7 +23,6 @@
   },
   "devDependencies": {
     "mocha": "1.x",
-    "sinon": "1.10.3",
     "coveralls": "2.x",
     "istanbul": "0.x"
   }
