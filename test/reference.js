@@ -7,10 +7,6 @@ var assert = require('assert'),
 describe('$ref', function () {
     it('throws if string is not in correct format', function () {
         assert.throws(function () {
-            jsen({ $ref: '' });
-        });
-
-        assert.throws(function () {
             jsen({ $ref: '#double//slash' });
         });
 
@@ -26,6 +22,11 @@ describe('$ref', function () {
         assert.doesNotThrow(function () {
             // schema resolves to itself
             jsen({ $ref: '#' });
+        });
+
+        assert.doesNotThrow(function () {
+            // empty string will not throw resolve
+            jsen({ $ref: '' });
         });
 
         assert.doesNotThrow(function () {
@@ -54,5 +55,18 @@ describe('$ref', function () {
                 }
             });
         });
+    });
+
+    it('does not resolve empty string', function () {
+        var schema = { $ref: '' },
+            validate = jsen(schema);
+
+        assert(validate(undefined));
+        assert(validate(null));
+        assert(validate(123));
+        assert(validate('abc'));
+        assert(validate(false));
+        assert(validate({}));
+        assert(validate([]));
     });
 });
