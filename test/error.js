@@ -70,4 +70,206 @@ describe('errors', function () {
         assert.notStrictEqual(validate.errors, previous);
         assert.deepEqual(validate.errors, previous);
     });
+
+    describe('error object', function () {
+        var schemas = [
+                {
+                    type: 'number'
+                },
+
+                {
+                    type: 'object',
+                    properties: {
+                        a: {
+                            type: 'string'
+                        }
+                    }
+                },
+
+                {
+                    type: 'array',
+                    uniqueItems: true
+                },
+
+                {
+                    type: 'array',
+                    items: {
+                        maximum: 10
+                    }
+                },
+
+                {
+                    type: 'object',
+                    properties: {
+                        a: {
+                            type: 'array',
+                            items: [{
+                                type: 'object',
+                                properties: {
+                                    b: {
+                                        multipleOf: 7
+                                    }
+                                }
+                            }]
+                        }
+                    }
+                },
+
+                {
+                    allOf: [
+                        { minimum: 5 },
+                        { maximum: 10 }
+                    ]
+                },
+
+                {
+                    type: 'object',
+                    properties: {
+                        a: {
+                            anyOf: [
+                                { type: 'string' },
+                                { type: 'number' }
+                            ]
+                        }
+                    }
+                },
+
+                {
+                    type: 'array',
+                    items: [{
+                        type: 'object',
+                        properties: {
+                            a: {
+                                oneOf: [
+                                    { type: 'boolean' },
+                                    { type: 'null' }
+                                ]
+                            }
+                        }
+                    }]
+                },
+
+                {
+                    type: 'object',
+                    properties: {
+                        a: {
+                            not: {
+                                type: 'string'
+                            }
+                        }
+                    }
+                },
+
+                {
+                    definitions: {
+                        positiveInteger: {
+                            type: 'integer',
+                            minimum: 0,
+                            exclusiveMinimum: true
+                        }
+                    },
+                    type: 'object',
+                    properties: {
+                        a: {
+                            type: 'object',
+                            properties: {
+                                b: {
+                                    type: 'object',
+                                    properties: {
+                                        c: {
+                                            $ref: '#/definitions/positiveInteger'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ],
+            data = [
+                '123',
+                { a: 123 },
+                [7, 11, 7],
+                [10, 11, 9],
+                { a: [{ b: 8 }] },
+                12,
+                { a: false },
+                [{ a: 123 }],
+                { a: 'abc' },
+                { a: { b: { c: 0 }}}
+            ];
+
+        it ('property: path', function () {
+            var expectedPaths = [
+                    [''],
+                    ['a'],
+                    [''],
+                    ['1'],
+                    ['a.0.b'],
+                    [''],
+                    ['a', 'a'],
+                    ['0.a', '0.a', '0.a'],
+                    ['a'],
+                    ['', 'a.b.c']
+                ],
+                validate, valid;
+
+            schemas.forEach(function (schema, index) {
+                validate = jsen(schema);
+                valid = validate(data[index]);
+
+                assert(!valid);
+
+                expectedPaths[index].forEach(function (path, pindex) {
+                    try {
+                        assert.strictEqual(validate.errors[pindex].path, path);
+                    }
+                    catch (e) {
+                        // console.log(index);
+                        // console.log(validate.errors);
+                        throw e;
+                    }
+                });
+            });
+        });
+
+        it ('property: keyword', function () {
+            var expectedKeywords = [
+                    ['type'],
+                    ['type'],
+                    ['uniqueItems'],
+                    ['maximum'],
+                    ['multipleOf'],
+                    ['maximum'],
+                    ['type', 'type', 'anyOf'],
+                    ['type', 'type', 'oneOf'],
+                    ['not'],
+                    ['exclusiveMinimum', '$ref']
+                ],
+                validate, valid;
+
+            schemas.forEach(function (schema, index) {
+                validate = jsen(schema);
+                valid = validate(data[index]);
+
+                assert(!valid);
+
+                expectedKeywords[index].forEach(function (keyword, kindex) {
+                    try {
+                        assert.strictEqual(validate.errors[kindex].keyword, keyword);
+                    }
+                    catch (e) {
+                        // console.log(index);
+                        // console.log(validate.errors);
+                        throw e;
+                    }
+                });
+            });
+        });
+    });
+
+    describe('multiple errors', function () {
+        it('returns multiple errors');
+        it('error objects are sorted by increasing path');
+    });
 });
