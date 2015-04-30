@@ -4,20 +4,12 @@ var assert = require('assert'),
     jsen = require('../index.js');
 
 describe('errors', function () {
-    it('errors is null before validation', function () {
+    it('errors is empty array before validation', function () {
         var schema = { type: 'number' },
             validate = jsen(schema);
 
-        assert.strictEqual(validate.errors, null);
-    });
-
-    it('errors property cannot be overwritten', function () {
-        var schema = { type: 'number' },
-            validate = jsen(schema);
-
-        validate.errors = 'overwritten';
-
-        assert.strictEqual(validate.errors, null);
+        assert(Array.isArray(validate.errors));
+        assert.strictEqual(validate.errors.length, 0);
     });
 
     it('no errors on successful validation', function () {
@@ -26,7 +18,8 @@ describe('errors', function () {
             valid = validate(123);
 
         assert(valid);
-        assert.strictEqual(validate.errors, null);
+        assert(Array.isArray(validate.errors));
+        assert.strictEqual(validate.errors.length, 0);
     });
 
     it('has errors when validation unsuccessful', function () {
@@ -48,7 +41,8 @@ describe('errors', function () {
         assert.strictEqual(validate.errors.length, 1);
 
         validate(123);
-        assert.strictEqual(validate.errors, null);
+        assert(Array.isArray(validate.errors));
+        assert.strictEqual(validate.errors.length, 0);
 
         validate('123');
         assert(Array.isArray(validate.errors));
@@ -234,7 +228,7 @@ describe('errors', function () {
                     ['a', 'a'],
                     ['0.a', '0.a', '0.a'],
                     ['a'],
-                    ['', 'a.b.c'],
+                    ['a.b.c'],
                     [''],
                     [''],
                     ['']
@@ -271,7 +265,7 @@ describe('errors', function () {
                     ['type', 'type', 'anyOf'],
                     ['type', 'type', 'oneOf'],
                     ['not'],
-                    ['exclusiveMinimum', '$ref'],
+                    ['exclusiveMinimum'],
                     ['required'],
                     ['required'],
                     ['dependencies']
@@ -299,7 +293,33 @@ describe('errors', function () {
     });
 
     describe('multiple errors', function () {
-        it('returns multiple errors');
-        it('error objects are sorted by increasing path');
+        var schema = {
+                definitions: {
+                    array: {
+                        maxItems: 1
+                    }
+                },
+                type: 'object',
+                properties: {
+                    a: {
+                        anyOf: [
+                            { items: { type: 'integer' } },
+                            { $ref: '#/definitions/array' },
+                            { items: [{ maximum: 3 }] }
+                        ]
+                    }
+                }
+            },
+            data = { a: [Math.PI, Math.E] },
+            validate = jsen(schema);
+
+        it('returns multiple errors', function () {
+            var valid = validate(data);
+
+            // console.log(validate.errors);
+
+            assert(!valid);
+            assert.strictEqual(validate.errors.length, 5);
+        });
     });
 });
