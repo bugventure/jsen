@@ -28,6 +28,7 @@ jsen (JSON Sentinel) validates your JSON objects using [JSON-Schema](http://json
     - [`oneOf`](#oneof)
     - [`not`](#not)
 - [Schema Reference Using `$ref`](#schema-reference-using-ref)
+- [Errors](#errors)
 - [Tests](#tests)
 - [Issues](#issues)
 - [Changelog](#changelog)
@@ -347,6 +348,56 @@ You can refer to types defined in other parts of the schema using the `$ref` pro
 
 Using references, it becomes possible to validate complex object graphs using recursive schema definitions. For example, the validator itself validates the user schema against the [JSON meta-schema][metaschema].
 
+## Errors
+
+The validator function (the one called with the object to validate) provides an `errors` array containing all reported errors in a single validation run.
+
+```javascript
+var validate = jsen({ type: 'string' });
+
+validate(123);      // false
+console.log(validate.errors)
+// Output: [{ path: '', keyword: 'type' }]
+
+// path - deep (dot-delimited) path to the property that failed validation
+// keyword - the JSON schema keyword that failed validation
+
+validate('abc');    // true
+// Output: []
+```
+
+The `errors` array may contain multiple errors from a single run.
+
+```javascript
+var validate = jsen({
+    anyOf: [
+        {
+            type: 'object',
+            properties: {
+                tags: { type: 'array' }
+            }
+        },
+        {
+            type: 'object',
+            properties: {
+                comment: { minLength: 1 }
+            }
+        }
+    ]
+});
+
+validate({ tags: null, comment: '' });
+
+console.log(validate.errors);
+/* Output:
+[ { path: 'tags', keyword: 'type' },
+  { path: 'comment', keyword: 'minLength' },
+  { path: '', keyword: 'anyOf' } ]
+*/
+```
+
+The errors array is replaced on every call of the validator function. You can safely modify the array without affecting successive validation runs.
+
 ## Tests
 
 To run [mocha][mocha] tests:
@@ -373,7 +424,8 @@ Please submit issues to the [jsen issue tracker in GitHub](https://github.com/bu
 
 * Improve generated validation code (#4)
 * Fail fast (#4)
-* Reduce the performance impact of logging validation errors
+* Error reporting (#5)
+* Reduce the performance impact of logging validation errors (#4)
 
 ### v0.0.4
 
