@@ -184,6 +184,27 @@ describe('errors', function () {
                             }
                         }
                     }
+                },
+
+                {
+                    type: 'object',
+                    required: ['a', 'b']
+                },
+
+                {
+                    type: 'object',
+                    dependencies: {
+                        a: {
+                            required: ['b']
+                        }
+                    }
+                },
+
+                {
+                    type: 'object',
+                    dependencies: {
+                        a: ['b']
+                    }
                 }
             ],
             data = [
@@ -196,7 +217,10 @@ describe('errors', function () {
                 { a: false },
                 [{ a: 123 }],
                 { a: 'abc' },
-                { a: { b: { c: 0 }}}
+                { a: { b: { c: 0 }}},
+                {},
+                { a: 123 },
+                { a: 123 }
             ];
 
         it ('property: path', function () {
@@ -210,7 +234,10 @@ describe('errors', function () {
                     ['a', 'a'],
                     ['0.a', '0.a', '0.a'],
                     ['a'],
-                    ['', 'a.b.c']
+                    ['', 'a.b.c'],
+                    [''],
+                    [''],
+                    ['']
                 ],
                 validate, valid;
 
@@ -244,7 +271,10 @@ describe('errors', function () {
                     ['type', 'type', 'anyOf'],
                     ['type', 'type', 'oneOf'],
                     ['not'],
-                    ['exclusiveMinimum', '$ref']
+                    ['exclusiveMinimum', '$ref'],
+                    ['required'],
+                    ['required'],
+                    ['dependencies']
                 ],
                 validate, valid;
 
