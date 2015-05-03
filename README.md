@@ -29,6 +29,7 @@ jsen (JSON Sentinel) validates your JSON objects using [JSON-Schema](http://json
     - [`not`](#not)
 - [Schema Reference Using `$ref`](#schema-reference-using-ref)
 - [Errors](#errors)
+    - [Custom Errors](#custom-errors)
 - [Tests](#tests)
 - [Issues](#issues)
 - [Changelog](#changelog)
@@ -399,6 +400,85 @@ console.log(validate.errors);
 
 The errors array is replaced on every call of the validator function. You can safely modify the array without affecting successive validation runs.
 
+### Custom Errors
+
+You can define your custom error messages in the schema object through the `invalidMessage` and `requiredMessage` keywords.
+
+```javascript
+var schema = {
+        type: 'object',
+        properties: {
+            username: {
+                type: 'string',
+                minLength: 5,
+                invalidMessage: 'Invalid username',
+                requiredMessage: 'Username is required'
+            }
+        },
+        required: ['username']
+    };
+var validate = jsen(schema);
+
+validate({});
+console.log(validate.errors);
+/* Output:
+[ { path: 'username',
+    keyword: 'required',
+    message: 'Username is required' } ]
+*/
+
+validate({ username: '' });
+console.log(validate.errors);
+/* Output:
+[ { path: 'username',
+    keyword: 'minLength',
+    message: 'Invalid username' } ]
+*/
+```
+
+Custom error messages are assigned to error objects by path, meaning multiple failed JSON schema keywords on the same path will show the same custom error message.
+
+```javascript
+var schema = {
+        type: 'object',
+        properties: {
+            age: {
+                type: 'integer',
+                minimum: 0,
+                maximum: 100,
+                invalidMessage: 'Invalid age specified'
+            }
+        }
+    };
+var validate = jsen(schema);
+
+validate({ age: 13.3 });
+console.log(validate.errors);
+/* Output:
+[ { path: 'age',
+    keyword: 'type',
+    message: 'Invalid age specified' } ]
+*/
+
+validate({ age: -5 });
+console.log(validate.errors);
+/* Output:
+[ { path: 'age',
+    keyword: 'minimum',
+    message: 'Invalid age specified' } ]
+*/
+
+validate({ age: 120 });
+console.log(validate.errors);
+/* Output:
+[ { path: 'age',
+    keyword: 'maximum',
+    message: 'Invalid age specified' } ]
+*/
+```
+
+The `requiredMessage` is assigned to errors coming from the `required` and `dependencies` keywords. For all other validation keywords, the `invalidMessage` is used.
+
 ## Tests
 
 To run [mocha][mocha] tests:
@@ -423,7 +503,8 @@ Please submit issues to the [jsen issue tracker in GitHub](https://github.com/bu
 
 ### v0.0.6
 
-* Append the required property name to the path in the error object for `required` and `dependencies` keywords (#7)
+* Custom error messages defined in the schema
+* Append the required property name to the path in the error object for `required` and `dependencies` keywords (#7) 
 
 ### v0.0.5
 

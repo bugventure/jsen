@@ -393,4 +393,83 @@ describe('errors', function () {
             assert.strictEqual(validate.errors.length, 5);
         });
     });
+
+    describe('custom errors', function () {
+        var schemas = [
+                {
+                    type: 'string',
+                    invalidMessage: 'string is invalid',
+                    requiredMessage: 'string is required'
+                },
+                {
+                    type: 'object',
+                    required: ['a'],
+                    properties: {
+                        a: {
+                            invalidMessage: 'a is invalid',
+                            requiredMessage: 'a is required'
+                        }
+                    }
+                },
+                {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            a: {
+                                type: 'object',
+                                properties: {
+                                    b: {
+                                        invalidMessage: 'b is invalid',
+                                        requiredMessage: 'b is required'
+                                    }
+                                },
+                                required: ['b']
+                            }
+                        }
+                    }
+                },
+                {
+                    type: 'object',
+                    properties: {
+                        a: {
+                            type: 'object',
+                            properties: {
+                                c: {
+                                    type: 'string',
+                                    invalidMessage: 'c is invalid',
+                                    requiredMessage: 'c is required'
+                                }
+                            }
+                        }
+                    }
+                }
+            ],
+            data = [
+                undefined,
+                {},
+                [{ a: {} }],
+                { a: { c: 123 }}
+            ],
+            expectedMessages = [
+                'string is invalid',
+                'a is required',
+                'b is required',
+                'c is invalid'
+            ],
+            validate,
+            valid;
+
+        schemas.forEach(function (schema, index) {
+            it (expectedMessages[index], function () {
+                validate = jsen(schema);
+
+                valid = validate(data[index]);
+
+                assert(!valid);
+                assert.strictEqual(validate.errors.length, 1);
+                assert.strictEqual(validate.errors[0].message, expectedMessages[index]);
+            });
+        });
+    });
 });
