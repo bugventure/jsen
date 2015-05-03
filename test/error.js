@@ -229,9 +229,9 @@ describe('errors', function () {
                     ['0.a', '0.a', '0.a'],
                     ['a'],
                     ['a.b.c'],
-                    [''],
-                    [''],
-                    ['']
+                    ['a'],
+                    ['b'],
+                    ['b']
                 ],
                 validate, valid;
 
@@ -289,6 +289,77 @@ describe('errors', function () {
                     }
                 });
             });
+        });
+
+        it('adds required property name to path', function () {
+            var schema = { type: 'object', required: ['a'] },
+                validate = jsen(schema),
+                valid = validate({});
+
+            assert(!valid);
+            assert.strictEqual(validate.errors.length, 1);
+            assert.strictEqual(validate.errors[0].path, 'a');
+            assert.strictEqual(validate.errors[0].keyword, 'required');
+
+            schema = {
+                type: 'object',
+                properties: {
+                    a: {
+                        type: 'array',
+                        items: {
+                            type: 'object',
+                            required: ['b']
+                        }
+                    }
+                }
+            };
+
+            validate = jsen(schema);
+            valid = validate({ a: [{}] });
+
+            assert(!valid);
+            assert.strictEqual(validate.errors.length, 1);
+            assert.strictEqual(validate.errors[0].path, 'a.0.b');
+            assert.strictEqual(validate.errors[0].keyword, 'required');
+        });
+
+        it('adds required dependency property to path', function () {
+            var schema = {
+                    type: 'object',
+                    dependencies: {
+                        a: ['b']
+                    }
+                },
+                validate = jsen(schema),
+                valid = validate({ a: 123 });
+
+            assert(!valid);
+            assert.strictEqual(validate.errors.length, 1);
+            assert.strictEqual(validate.errors[0].path, 'b');
+            assert.strictEqual(validate.errors[0].keyword, 'dependencies');
+
+            schema = {
+                type: 'object',
+                properties: {
+                    a: {
+                        type: 'array',
+                        items: {
+                            type: 'object',
+                            dependencies: {
+                                a: ['b']
+                            }
+                        }
+                    }
+                }
+            };
+
+            validate = jsen(schema);
+            valid = validate({ a: [{ a: 123 }] });
+
+            assert(!valid);
+            assert.strictEqual(validate.errors.length, 1);
+            assert.strictEqual(validate.errors[0].path, 'a.0.b');
+            assert.strictEqual(validate.errors[0].keyword, 'dependencies');
         });
     });
 
