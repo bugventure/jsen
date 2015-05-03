@@ -505,6 +505,8 @@ Please submit issues to the [jsen issue tracker in GitHub](https://github.com/bu
 
 * Custom error messages defined in the schema
 * Append the required property name to the path in the error object for `required` and `dependencies` keywords (#7) 
+* Fix protocol-relative URIs are marked invalid (#13)
+* Update [JSON-Schema-Test-Suite](https://github.com/json-schema/JSON-Schema-Test-Suite) tests (#12)
 
 ### v0.0.5
 
