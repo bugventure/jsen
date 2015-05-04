@@ -33,6 +33,7 @@ jsen (JSON Sentinel) validates your JSON objects using [JSON-Schema](http://json
 - [Tests](#tests)
 - [Issues](#issues)
 - [Changelog](#changelog)
+    - [v0.1.2](#v012)
     - [v0.1.1](#v011)
     - [v0.1.0](#v010)
     - [v0.0.5](#v005)
@@ -501,6 +502,10 @@ Source code coverage is provided by [istanbul][istanbul] and visible on [coveral
 Please submit issues to the [jsen issue tracker in GitHub](https://github.com/bugventure/jsen/issues).
 
 ## Changelog
+
+### v0.1.2
+
+* Fix cannot dereference schema when ids change resolution scope (#14)
 
 ### v0.1.1
 
