@@ -14,4 +14,22 @@ describe('fixes', function () {
             jsen(schema);
         });
     });
+
+    it('Fix code generation breaks when object properties in schema are not valid identifiers (#16)', function () {
+        var schema = {
+                type: 'object',
+                properties: {
+                    123: {
+                        type: 'boolean'
+                    }
+                }
+            },
+            validate;
+
+        assert.doesNotThrow(function () {
+            validate = jsen(schema);
+        });
+
+        assert(validate({ 123: true }));
+    });
 });
