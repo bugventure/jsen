@@ -33,7 +33,7 @@ jsen (JSON Sentinel) validates your JSON objects using [JSON-Schema](http://json
 - [Tests](#tests)
 - [Issues](#issues)
 - [Changelog](#changelog)
-    - [v0.0.6](#v006)
+    - [v0.1.0](#v010)
     - [v0.0.5](#v005)
     - [v0.0.4](#v004)
     - [v0.0.3](#v003)
@@ -501,7 +501,7 @@ Please submit issues to the [jsen issue tracker in GitHub](https://github.com/bu
 
 ## Changelog
 
-### v0.0.6
+### v0.1.0
 
 * Custom error messages defined in the schema
 * Append the required property name to the path in the error object for `required` and `dependencies` keywords (#7) 
