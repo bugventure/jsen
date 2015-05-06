@@ -157,4 +157,110 @@ describe('format', function () {
         // assert(!validate(maxLong1 + '.a'));
         // assert(!validate(maxLong2 + '.a'));
     });
+
+    describe('custom format', function () {
+        it('accepts string', function () {
+            var schema = { format: 'custom' },
+                custom = '^\\d+$',
+                validate = jsen(schema, {
+                    formats: {
+                        custom: custom
+                    }
+                });
+
+            assert(validate('123'));
+            assert(!validate('a123'));
+        });
+
+        it('accepts regex', function () {
+            var schema = { format: 'custom' },
+                custom = /^\d+$/,
+                validate = jsen(schema, {
+                    formats: {
+                        custom: custom
+                    }
+                });
+
+            assert(validate('123'));
+            assert(!validate('a123'));
+        });
+
+        it('accepts function', function () {
+            var schema = { format: 'custom' },
+                callCount = 0,
+                custom = function (value, childSchema) {
+                    assert(value.indexOf('123') > -1);
+                    assert.strictEqual(childSchema, schema);
+
+                    callCount++;
+
+                    return /^\d+$/.test(value);
+                },
+                validate = jsen(schema, {
+                    formats: {
+                        custom: custom
+                    }
+                });
+
+            assert(validate('123'));
+            assert(!validate('a123'));
+            assert.strictEqual(callCount, 2);
+        });
+
+        it('is run for all types', function () {
+            var schema = { format: 'custom' },
+                callCount = 0,
+                options = {
+                    formats: {
+                        custom: function () {
+                            callCount++;
+                            return true;
+                        }
+                    }
+                },
+                validate = jsen(schema, options),
+                data = [
+                    undefined,
+                    null,
+                    'abc',
+                    123,
+                    Math.PI,
+                    true,
+                    false,
+                    {},
+                    [],
+                    new Date()
+                ];
+
+            data.forEach(function (dataItem) {
+                validate(dataItem);
+                assert.strictEqual(callCount, 1);
+                callCount = 0;
+            });
+        });
+
+        it('is not run if a built-in keyword fails', function () {
+            var schema = {
+                    format: 'custom',
+                    type: 'number',
+                    maximum: 10
+                },
+                callCount = 0,
+                options = {
+                    formats: {
+                        custom: function () {
+                            callCount++;
+                            return true;
+                        }
+                    }
+                },
+                validate = jsen(schema, options);
+
+            assert(!validate(123));
+            assert.strictEqual(callCount, 0);
+
+            assert(validate(7));
+            assert.strictEqual(callCount, 1);
+        });
+    });
 });
