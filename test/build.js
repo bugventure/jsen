@@ -27,7 +27,19 @@ describe('build', function () {
                 true,
                 false,
                 123,
-                Math.PI,
+                Math.PI
+            ],
+            obj;
+
+        initials.forEach(function (initial) {
+            obj = validate.build(initial);
+            assert.strictEqual(obj, initial);
+        });
+    });
+
+    it('returns a copy of initial defined value', function () {
+        var validate = jsen({ type: 'string', default: 'abc' }),
+            initials = [
                 {},
                 [],
                 new Date()
@@ -36,7 +48,8 @@ describe('build', function () {
 
         initials.forEach(function (initial) {
             obj = validate.build(initial);
-            assert.strictEqual(obj, initial);
+            assert.notStrictEqual(obj, initial);
+            assert.deepEqual(obj, initial);
         });
     });
 
@@ -60,7 +73,7 @@ describe('build', function () {
         initials.forEach(function (initial) {
             obj = validate.build(initial);
 
-            assert.strictEqual(obj, initial);
+            assert.deepEqual(obj, initial);
         });
     });
 
@@ -414,8 +427,37 @@ describe('build', function () {
     });
 
     describe('option: copy', function () {
-        it('returns deep copy of the initial object by default');
-        it('modifies the initial object when copy = false');
+        it('returns deep copy of the initial object by default', function () {
+            var schema = {},
+                initial = {},
+                validate = jsen(schema);
+
+            assert.deepEqual(validate.build(initial), initial);
+            assert.notStrictEqual(validate.build(initial), initial);
+        });
+
+        it('modifies the initial object when copy = false', function () {
+            var schema = {
+                    properties: {
+                        a: { default: 'foo' },
+                        b: {
+                            items: {
+                                properties: {
+                                    c: { default: 'bar' },
+                                    d: { default: 'baz' }
+                                }
+                            }
+                        }
+                    }
+                },
+                initial = { b: [{ d: 'xyz' }] },
+                expected = { a: 'foo', b: [{ c: 'bar', d: 'xyz' }]},
+                validate = jsen(schema),
+                actual = validate.build(initial, { copy: false });
+
+            assert.deepEqual(actual, expected);
+            assert.strictEqual(actual, initial);
+        });
     });
 
     describe('option: additionalProperties', function () {
