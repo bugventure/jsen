@@ -472,4 +472,344 @@ describe('errors', function () {
             });
         });
     });
+
+    describe('custom keyword messages', function () {
+        it('uses custom messages on keywords', function () {
+            var schemas = [
+                    {
+                        type: 'string',
+                        messages: { type: 'custom message for keyword "type"' }
+                    },
+                    {
+                        enum: [1, 2, 3],
+                        messages: { enum: 'custom message for keyword "enum"' }
+                    },
+                    {
+                        minimum: 3,
+                        messages: { minimum: 'custom message for keyword "minimum"' }
+                    },
+                    {
+                        minimum: 3,
+                        exclusiveMinimum: true,
+                        messages: { exclusiveMinimum: 'custom message for keyword "exclusiveMinimum"' }
+                    },
+                    {
+                        maximum: 10,
+                        messages: { maximum: 'custom message for keyword "maximum"' }
+                    },
+                    {
+                        maximum: 10,
+                        exclusiveMaximum: true,
+                        messages: { exclusiveMaximum: 'custom message for keyword "exclusiveMaximum"' }
+                    },
+                    {
+                        multipleOf: 5,
+                        messages: { multipleOf: 'custom message for keyword "multipleOf"' }
+                    },
+                    {
+                        minLength: 3,
+                        messages: { minLength: 'custom message for keyword "minLength"' }
+                    },
+                    {
+                        maxLength: 5,
+                        messages: { maxLength: 'custom message for keyword "maxLength"' }
+                    },
+                    {
+                        pattern: '\\d+',
+                        messages: { pattern: 'custom message for keyword "pattern"' }
+                    },
+                    {
+                        format: 'email',
+                        messages: { format: 'custom message for keyword "format"' }
+                    },
+                    {
+                        minItems: 1,
+                        messages: { minItems: 'custom message for keyword "minItems"' }
+                    },
+                    {
+                        maxItems: 1,
+                        messages: { maxItems: 'custom message for keyword "maxItems"' }
+                    },
+                    {
+                        additionalItems: false,
+                        items: [{ type: 'string' }],
+                        messages: { additionalItems: 'custom message for keyword "additionalItems"' }
+                    },
+                    {
+                        uniqueItems: true,
+                        messages: { uniqueItems: 'custom message for keyword "uniqueItems"' }
+                    },
+                    {
+                        minProperties: 1,
+                        messages: { minProperties: 'custom message for keyword "minProperties"' }
+                    },
+                    {
+                        maxProperties: 1,
+                        messages: { maxProperties: 'custom message for keyword "maxProperties"' }
+                    },
+                    {
+                        required: ['foo'],
+                        messages: { required: 'custom message for keyword "required"' }
+                    },
+                    {
+                        required: ['foo'],
+                        properties: {
+                            foo: {
+                                messages: {
+                                    required: 'custom message for keyword "required"'
+                                }
+                            }
+                        }
+                    },
+                    {
+                        required: ['foo'],
+                        properties: {
+                            foo: {
+                                messages: {
+                                    required: 'this custom message for keyword "required" is assigned'
+                                }
+                            }
+                        },
+                        messages: { required: 'this custom message for keyword "required" is NOT assigned' }
+                    },
+                    {
+                        additionalProperties: false,
+                        messages: { additionalProperties: 'custom message for keyword "additionalProperties"' }
+                    },
+                    {
+                        dependencies: {
+                            foo: ['bar']
+                        },
+                        messages: { dependencies: 'custom message for keyword "dependencies"' }
+                    },
+                    {
+                        anyOf: [
+                            { type: 'string' },
+                            { type: 'integer' }
+                        ],
+                        messages: { anyOf: 'custom message for keyword "anyOf"' }
+                    },
+                    {
+                        oneOf: [
+                            { type: 'string' },
+                            { type: 'integer' }
+                        ],
+                        messages: { oneOf: 'custom message for keyword "oneOf"' }
+                    },
+                    {
+                        not: {
+                            type: 'string'
+                        },
+                        messages: { not: 'custom message for keyword "not"' }
+                    }
+                ],
+                data = [
+                    123,
+                    5,
+                    1,
+                    3,
+                    11,
+                    10,
+                    12,
+                    'ab',
+                    'abcdef',
+                    'abc',
+                    'invalid email',
+                    [],
+                    [1, 2, 3],
+                    ['abc', 'def'],
+                    [1, 2, 2],
+                    {},
+                    { foo: 1, bar: 2 },
+                    {},
+                    {},
+                    {},
+                    { foo: 'bar' },
+                    { foo: 'abc' },
+                    null,
+                    null,
+                    'abc'
+                ],
+                expectedMessages = [
+                    schemas[0].messages.type,
+                    schemas[1].messages.enum,
+                    schemas[2].messages.minimum,
+                    schemas[3].messages.exclusiveMinimum,
+                    schemas[4].messages.maximum,
+                    schemas[5].messages.exclusiveMaximum,
+                    schemas[6].messages.multipleOf,
+                    schemas[7].messages.minLength,
+                    schemas[8].messages.maxLength,
+                    schemas[9].messages.pattern,
+                    schemas[10].messages.format,
+                    schemas[11].messages.minItems,
+                    schemas[12].messages.maxItems,
+                    schemas[13].messages.additionalItems,
+                    schemas[14].messages.uniqueItems,
+                    schemas[15].messages.minProperties,
+                    schemas[16].messages.maxProperties,
+                    schemas[17].messages.required,
+                    schemas[18].properties.foo.messages.required,
+                    schemas[19].properties.foo.messages.required,
+                    schemas[20].messages.additionalProperties,
+                    schemas[21].messages.dependencies,
+                    schemas[22].messages.anyOf,
+                    schemas[23].messages.oneOf,
+                    schemas[24].messages.not
+                ],
+                validate,
+                valid;
+
+            schemas.forEach(function (schema, index) {
+                validate = jsen(schema);
+
+                valid = validate(data[index]);
+
+                assert(!valid);
+                assert.strictEqual(validate.errors[validate.errors.length - 1].message, expectedMessages[index]);
+            });
+        });
+
+        it('does not use custom messages on keyword: items (object)', function () {
+            var schema = {
+                    items: {
+                        type: 'string',
+                        messages: {
+                            type: 'will be assigned'
+                        }
+                    },
+                    messages: {
+                        items: 'will not be assigned'
+                    }
+                },
+                validate = jsen(schema),
+                valid = validate([123]);
+
+            assert(!valid);
+            assert.strictEqual(validate.errors.length, 1);
+            assert.strictEqual(validate.errors[0].message, 'will be assigned');
+        });
+
+        it('does not use custom messages on keyword: items (array)', function () {
+            var schema = {
+                    items: [{
+                        type: 'string',
+                        messages: {
+                            type: 'will be assigned'
+                        }
+                    }],
+                    messages: {
+                        items: 'will not be assigned'
+                    }
+                },
+                validate = jsen(schema),
+                valid = validate([123, 123]);
+
+            assert(!valid);
+            assert.strictEqual(validate.errors.length, 1);
+            assert.strictEqual(validate.errors[0].message, 'will be assigned');
+        });
+
+        it('does not use custom messages on keyword: properties', function () {
+            var schema = {
+                    properties: {
+                        foo: {
+                            type: 'number',
+                            messages: {
+                                type: 'will be assigned'
+                            }
+                        }
+                    },
+                    messages: {
+                        properties: 'will not be assigned'
+                    }
+                },
+                validate = jsen(schema),
+                valid = validate({ foo: 'bar' });
+
+            assert(!valid);
+            assert.strictEqual(validate.errors.length, 1);
+            assert.strictEqual(validate.errors[0].message, 'will be assigned');
+        });
+
+        it('does not use custom messages on keyword: patternProperties', function () {
+            var schema = {
+                    patternProperties: {
+                        '^foo$': {
+                            type: 'number',
+                            messages: {
+                                type: 'will be assigned'
+                            }
+                        }
+                    },
+                    messages: {
+                        patternProperties: 'will not be assigned'
+                    }
+                },
+                validate = jsen(schema),
+                valid = validate({ foo: 'bar' });
+
+            assert(!valid);
+            assert.strictEqual(validate.errors.length, 1);
+            assert.strictEqual(validate.errors[0].message, 'will be assigned');
+        });
+
+        it('does not use custom messages on keyword: dependencies (schema)', function () {
+            var schema = {
+                    dependencies: {
+                        foo: {
+                            minProperties: 2,
+                            messages: {
+                                minProperties: 'will be assigned'
+                            }
+                        }
+                    },
+                    messages: {
+                        dependencies: 'will not be assigned'
+                    }
+                },
+                validate = jsen(schema),
+                valid = validate({ foo: 'bar' });
+
+            assert(!valid);
+            assert.strictEqual(validate.errors.length, 1);
+            assert.strictEqual(validate.errors[0].message, 'will be assigned');
+        });
+
+        it('does not use custom messages on keyword: allOf', function () {
+            var schema = {
+                    dependencies: {
+                        foo: {
+                            minProperties: 2,
+                            messages: {
+                                minProperties: 'will be assigned'
+                            }
+                        }
+                    },
+                    allOf: [
+                        {
+                            minimum: 2,
+                            messages: {
+                                minimum: 'will not be assigned'
+                            }
+                        },
+                        {
+                            maximum: 5,
+                            messages: {
+                                maximum: 'will be assigned'
+                            }
+                        }
+                    ],
+                    messages: {
+                        allOf: 'will not be assigned'
+                    }
+                },
+                validate = jsen(schema),
+                valid = validate(6);
+
+            assert(!valid);
+            assert.strictEqual(validate.errors.length, 1);
+            assert.strictEqual(validate.errors[0].message, 'will be assigned');
+        });
+    });
 });

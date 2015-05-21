@@ -18,9 +18,11 @@ jsen (JSON Sentinel) validates your JSON objects using [JSON-Schema](http://json
     - [Custom Formats](#custom-formats)
 - [Errors](#errors)
     - [Custom Errors](#custom-errors)
+    - [Custom Errors for Keywords](#custom-errors-for-keywords)
 - [Tests](#tests)
 - [Issues](#issues)
 - [Changelog](#changelog)
+    - [v0.3.0](#v030)
     - [v0.2.0](#v020)
     - [v0.1.2](#v012)
     - [v0.1.1](#v011)
@@ -279,6 +281,30 @@ console.log(validate.errors);
 
 The `requiredMessage` is assigned to errors coming from the `required` and `dependencies` keywords. For all other validation keywords, the `invalidMessage` is used.
 
+### Custom Errors for Keywords
+
+You can assign custom error messages to keywords through the `messages` object in the JSON schema.
+
+```javascript
+var schema = {
+    type: 'object',
+    messages: {
+        type: 'Invalid data type where an object is expected'
+    }
+}
+var validate = jsen(schema);
+
+validate('this is a string, not an object');
+console.log(validate.errors);
+/* Output:
+[ { path: '',
+    keyword: 'type',
+    message: 'Invalid data type where an object is expected' } ]
+*/
+```
+
+**NOTE**: The following keywords are never assigned to error objects, and thus do not support custom error messages: `items`, `properties`, `patternProperties`, `dependecies` (when defining a [schema dependency](http://json-schema.org/latest/json-schema-validation.html#anchor70)) and `allOf`.
+
 ## Tests
 
 To run [mocha][mocha] tests:
@@ -300,6 +326,10 @@ Source code coverage is provided by [istanbul][istanbul] and visible on [coveral
 Please submit issues to the [jsen issue tracker in GitHub](https://github.com/bugventure/jsen/issues).
 
 ## Changelog
+
+### v0.3.0
+
+* Add support for custom messages per keyword (#18)
 
 ### v0.2.0
 
