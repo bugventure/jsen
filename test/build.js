@@ -554,5 +554,19 @@ describe('build', function () {
             assert.strictEqual(actual, initial);
             assert.deepEqual(actual, expected);
         });
+
+        it('schema.additionalProperties takes precedence', function () {
+            var schema = {
+                    additionalProperties: true,
+                    properties: {
+                        foo: {}
+                    }
+                },
+                initial = { foo: 1, bar: 2 },
+                expected = { foo: 1, bar: 2 },
+                validate = jsen(schema);
+
+            assert.deepEqual(validate.build(initial, { additionalProperties: false }), expected);
+        });
     });
 });
