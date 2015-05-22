@@ -307,6 +307,22 @@ describe('build', function () {
         });
     });
 
+    it('$ref', function () {
+        var schema = {
+                definitions: {
+                    positiveInteger: {
+                        type: 'integer',
+                        minimum: 1,
+                        default: 7
+                    }
+                },
+                $ref: '#definitions/positiveInteger'
+            },
+            validate = jsen(schema);
+
+        assert.strictEqual(validate.build(), 7);
+    });
+
     describe('object', function () {
         it('clones default object and subproperties recursively', function () {
             var schema = {
