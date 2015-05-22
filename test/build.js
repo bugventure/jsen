@@ -461,8 +461,82 @@ describe('build', function () {
     });
 
     describe('option: additionalProperties', function () {
-        it('includes additional properties by default');
-        it('excludes additional properties from returned object when additionalProperties = false');
-        it('removes additional properties from the initial object when additionalProperties = false and copy = false');
+        it('includes by default', function () {
+            var schema = {
+                    properties: {
+                        foo: {}
+                    }
+                },
+                initial = { foo: 1, bar: 2 },
+                expected = { foo: 1, bar: 2 },
+                validate = jsen(schema);
+
+            assert.deepEqual(validate.build(initial), expected);
+        });
+
+        it('excludes when schema.additionalProperties = false', function () {
+            var schema = {
+                    additionalProperties: false,
+                    properties: {
+                        foo: {}
+                    }
+                },
+                initial = { foo: 1, bar: 2 },
+                expected = { foo: 1 },
+                validate = jsen(schema);
+
+            assert.deepEqual(validate.build(initial), expected);
+        });
+
+        it('excludes when options.additionalProperties = false', function () {
+            var schema = {
+                    properties: {
+                        foo: {}
+                    }
+                },
+                initial = { foo: 1, bar: 2 },
+                expected = { foo: 1 },
+                validate = jsen(schema);
+
+            assert.deepEqual(validate.build(initial, { additionalProperties: false }), expected);
+        });
+
+        it('removes from the initial object when schema.additionalProperties = false and options.copy = false', function () {
+            var schema = {
+                    additionalProperties: false,
+                    properties: {
+                        foo: {}
+                    }
+                },
+                initial = { foo: 1, bar: 2 },
+                expected = { foo: 1 },
+                validate = jsen(schema),
+                actual;
+
+            actual = validate.build(initial, { copy: false });
+
+            assert.strictEqual(actual, initial);
+            assert.deepEqual(actual, expected);
+        });
+
+        it('removes from the initial object when options.additionalProperties = false and options.copy = false', function () {
+            var schema = {
+                    properties: {
+                        foo: {}
+                    }
+                },
+                initial = { foo: 1, bar: 2 },
+                expected = { foo: 1 },
+                validate = jsen(schema),
+                actual;
+
+            actual = validate.build(initial, {
+                copy: false,
+                additionalProperties: false
+            });
+
+            assert.strictEqual(actual, initial);
+            assert.deepEqual(actual, expected);
+        });
     });
 });
