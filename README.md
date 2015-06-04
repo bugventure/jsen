@@ -25,6 +25,7 @@ jsen (JSON Sentinel) validates your JSON objects using [JSON-Schema](http://json
 - [Tests](#tests)
 - [Issues](#issues)
 - [Changelog](#changelog)
+    - [v0.3.1](#v031)
     - [v0.3.0](#v030)
     - [v0.2.0](#v020)
     - [v0.1.2](#v012)
@@ -433,6 +434,10 @@ Source code coverage is provided by [istanbul][istanbul] and visible on [coveral
 Please submit issues to the [jsen issue tracker in GitHub](https://github.com/bugventure/jsen/issues).
 
 ## Changelog
+
+### v0.3.1
+
+* Add support for IE8
 
 ### v0.3.0
 
