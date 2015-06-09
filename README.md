@@ -22,6 +22,7 @@ jsen (JSON Sentinel) validates your JSON objects using [JSON-Schema](http://json
 - [Gathering Default Values](#gathering-default-values)
     - [options.copy](#optionscopy)
     - [options.additionalProperties](#optionsadditionalproperties)
+- [In-Browser Usage](#in-browser-usage)
 - [Tests](#tests)
 - [Issues](#issues)
 - [Changelog](#changelog)
@@ -40,6 +41,8 @@ jsen (JSON Sentinel) validates your JSON objects using [JSON-Schema](http://json
 
 ## Getting Started
 
+Install through NPM in node.
+
 ```bash
 $ npm install jsen --save
 ```
@@ -47,7 +50,21 @@ $ npm install jsen --save
 ```javascript
 var jsen = require('jsen');
 var validate = jsen({ type: 'string' });
-var valid = validate('some value');
+var valid = validate('some value');             // true
+```
+
+Install through Bower in your HTML page.
+
+```bash
+$ bower install jsen
+```
+
+```javascript
+<script src="bower_components/jsen/dist/jsen.min.js"></script>
+<script>
+    var validate = jsen({ type: 'string' });    // under window.jsen
+    var valid = validate('some value');         // true
+</script>
 ```
 
 Validation works by passing a JSON schema to build a validator function that can be used to validate a JSON object.
@@ -413,12 +430,26 @@ console.log(initial);   // { foo: 1, bar: 2, baz: 3 }
 
 NOTE: When `{ additionalProperties: false, copy: false }` is specified in the `build` options, any additional properties will be deleted from the initial data object.
 
+## In-Browser Usage
+
+Browser-compatible builds of `jsen` (with the help of [browserify](http://npmjs.com/package/browserify)) can be found in the `dist` folder. These are built with the [standalone](https://github.com/substack/browserify-handbook#standalone) option of browserify, meaning they will work in node, the browser with globals, and AMD loader environments. In the browser, the `window.jsen` global object will refer to the validator builder function.
+
 ## Tests
 
-To run [mocha][mocha] tests:
+To run [mocha][mocha] tests in node:
 
 ```bash
 $ npm test
+```
+
+To run the same test suite in the browser, serve the `test/index.html` page in your node web server and navitate to `/test/` path from your browser. The example below uses [node-static](https://www.npmjs.com/package/node-static):
+
+```bash
+[~/github/jsen] $ npm install -g node-static
+...
+[~/github/jsen] $ static .
+serving "." at http://127.0.0.1:8080
+# navigate to http://127.0.0.1:8080/test/ in your browser
 ```
 
 `jsen` passes all draft 4 test cases specified by the [JSON-Schema-Test-Suite](https://github.com/json-schema/JSON-Schema-Test-Suite) with the exception of:
