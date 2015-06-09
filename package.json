@@ -19,13 +19,14 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "build": "cat ./lib/header > ./dist/jsen.js && ./node_modules/.bin/browserify index.js -s jsen >> ./dist/jsen.js",
+    "build": "cat ./lib/header > ./dist/jsen.js && ./node_modules/.bin/browserify index.js -s jsen >> ./dist/jsen.js && ./node_modules/.bin/uglify -s ./dist/jsen.js -o ./dist/jsen.min.temp && cp ./lib/header ./dist/jsen.min.js && cat ./dist/jsen.min.temp >> ./dist/jsen.min.js && rm ./dist/jsen.min.temp",
     "coverage": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls && rm -rf ./coverage"
   },
   "devDependencies": {
     "mocha": "1.x",
     "coveralls": "2.x",
     "istanbul": "0.x",
-    "browserify": "10.x"
+    "browserify": "10.x",
+    "uglify": "0.x"
   }
 }
