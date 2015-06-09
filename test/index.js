@@ -1,7 +1,7 @@
 'use strict';
 
-var assert = require('assert'),
-    jsen = require('../index.js');
+var assert = assert || require('assert'),
+    jsen = jsen || require('../index.js');
 
 describe('jsen', function () {
     it('is a function', function () {

@@ -1,8 +1,9 @@
 /* global describe, it */
 'use strict';
 
-var assert = require('assert'),
-    equal = require('../lib/equal.js');
+var assert = assert || require('assert'),
+    jsen = jsen || require('../index.js'),
+    equal = jsen.equal;
 
 describe('equal', function () {
     it('string', function () {

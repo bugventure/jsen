@@ -1,7 +1,7 @@
 'use strict';
 
-var assert = require('assert'),
-    jsen = require('../index.js');
+var assert = assert || require('assert'),
+    jsen = jsen || require('../index.js');
 
 describe('errors', function () {
     it('errors is empty array before validation', function () {

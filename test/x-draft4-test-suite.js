@@ -1,11 +1,13 @@
 /* global describe, it */
 'use strict';
 
-var fs = require('fs'),
-    path = require('path'),
-    assert = require('assert'),
-    jsen = require('../index.js'),
-    dir = 'draft4',
+var dir = 'draft4',
+    inBrowser = 'navigator' in this && navigator.userAgent, // jshint ignore: line
+    path = inBrowser ? null : require('path'),
+    fs = inBrowser ? null : require('fs'),
+    assert = assert || require('assert'),
+    jsen = jsen || require('../index.js'),
+    testDir = inBrowser ? './' + dir + '/' : path.resolve(__dirname, dir),
     files,
     testCategories = [],
     error,
@@ -16,30 +18,87 @@ var fs = require('fs'),
     excludedCases = [
         'two supplementary Unicode code points is long enough',
         'one supplementary Unicode code point is not long enough'
-    ];
+    ],
+    walk;
 
-function walk(dir) {
-    files = fs.readdirSync(dir);
+if (inBrowser) {
+    walk = function (dir) {
+        var specs = [
+                'optional/bignum',
+                'optional/format',
+                'additionalItems',
+                'additionalProperties',
+                'allOf',
+                'anyOf',
+                'default',
+                'definitions',
+                'dependencies',
+                'enum',
+                'items',
+                'maxItems',
+                'maxLength',
+                'maxProperties',
+                'maximum',
+                'minItems',
+                'minLength',
+                'minProperties',
+                'minimum',
+                'multipleOf',
+                'not',
+                'oneOf',
+                'pattern',
+                'patternProperties',
+                'properties',
+                'ref',
+                'required',
+                'type',
+                'uniqueItems'
+            ],
+            xhr, spec;
 
-    files.forEach(function (filename) {
-        var fullpath = path.resolve(dir, filename),
-            stat = fs.statSync(fullpath);
+        while (specs.length) {
+            spec = specs.shift();
 
-        if (stat.isFile() && path.extname(filename) === '.json' &&
-            excludedFiles.indexOf(path.basename(filename, '.json')) < 0) {
-            testCategories.push({
-                name: path.basename(filename, '.json'),
-                testGroups: require(fullpath)
-            });
+            xhr = new XMLHttpRequest();     // jshint ignore: line
+
+            xhr.onload = function () {
+                testCategories.push({
+                    name: spec,
+                    testGroups: JSON.parse(this.response)
+                });
+            };                              // jshint ignore: line
+
+            xhr.open('GET', dir + spec + '.json', false);
+
+            xhr.send(null);
         }
-        else if (stat.isDirectory()) {
-            walk(path.resolve(dir, filename));
-        }
-    });
+
+    };
+}
+else {
+    walk = function (dir) {
+        files = fs.readdirSync(dir);
+
+        files.forEach(function (filename) {
+            var fullpath = path.resolve(dir, filename),
+                stat = fs.statSync(fullpath);
+
+            if (stat.isFile() && path.extname(filename) === '.json' &&
+                excludedFiles.indexOf(path.basename(filename, '.json')) < 0) {
+                testCategories.push({
+                    name: path.basename(filename, '.json'),
+                    testGroups: require(fullpath)
+                });
+            }
+            else if (stat.isDirectory()) {
+                walk(path.resolve(dir, filename));
+            }
+        });
+    };
 }
 
 try {
-    walk(path.resolve(__dirname, dir));
+    walk(testDir);
 }
 catch (e) {
     error = e;

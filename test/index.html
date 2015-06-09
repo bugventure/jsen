@@ -7,15 +7,11 @@
 </head>
 <body>
     <div id="mocha"></div>
+    <script src="../dist/jsen.js"></script>
+
     <script src="https://rawgit.com/Jxck/assert/master/assert.js"></script>
     <script src="../node_modules/mocha/mocha.js"></script>
     <script>mocha.setup('bdd')</script>
-
-    <script>
-        function require(moduleName) {
-            return window[moduleName];
-        }
-    </script>
 
     <script src="any.js"></script>
     <script src="array.js"></script>
@@ -37,8 +33,6 @@
     <script src="string.js"></script>
     <script src="unique.js"></script>
     <script src="x-draft4-test-suite.js"></script>
-
-    <script src="../dist/jsen.js"></script>
 
     <script>
         mocha.checkLeaks();

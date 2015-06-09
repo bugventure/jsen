@@ -1,7 +1,7 @@
 'use strict';
 
-var assert = require('assert'),
-    jsen = require('../index.js');
+var assert = assert || require('assert'),
+    jsen = jsen || require('../index.js');
 
 describe('build', function () {
     it('validator function has a build property', function () {

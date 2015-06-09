@@ -1073,6 +1073,8 @@ function jsen(schema, options) {
 }
 
 jsen.clone = clone;
+jsen.equal = equal;
+jsen.unique = unique;
 
 module.exports = jsen;
 

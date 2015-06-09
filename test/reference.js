@@ -1,8 +1,8 @@
 /* global describe, it */
 'use strict';
 
-var assert = require('assert'),
-    jsen = require('../index.js');
+var assert = assert || require('assert'),
+    jsen = jsen || require('../index.js');
 
 describe('$ref', function () {
     it('throws if string is not in correct format', function () {

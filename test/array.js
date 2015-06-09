@@ -1,8 +1,8 @@
 /* global describe, it */
 'use strict';
 
-var assert = require('assert'),
-    jsen = require('../index.js');
+var assert = assert || require('assert'),
+    jsen = jsen || require('../index.js');
 
 describe('type: array', function () {
     it('required', function () {

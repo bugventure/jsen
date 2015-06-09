@@ -1,8 +1,9 @@
 /* global describe, it */
 'use strict';
 
-var assert = require('assert'),
-    unique = require('../lib/unique.js');
+var assert = assert || require('assert'),
+    jsen = jsen || require('../index.js'),
+    unique = jsen.unique;
 
 describe('unique', function () {
     it('filters unique values', function () {
