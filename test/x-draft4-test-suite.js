@@ -63,7 +63,7 @@ if (jsen.browser) {
             xhr.onload = function () {
                 testCategories.push({
                     name: spec,
-                    testGroups: JSON.parse(this.response)
+                    testGroups: JSON.parse(this.responseText)
                 });
             };                              // jshint ignore: line
 
