@@ -27,16 +27,6 @@ jsen (JSON Sentinel) validates your JSON objects using [JSON-Schema](http://json
 - [Contributing](#contributing)
 - [Issues](#issues)
 - [Changelog](#changelog)
-    - [v0.3.2](#v032)
-    - [v0.3.1](#v031)
-    - [v0.3.0](#v030)
-    - [v0.2.0](#v020)
-    - [v0.1.2](#v012)
-    - [v0.1.1](#v011)
-    - [v0.1.0](#v010)
-    - [v0.0.5](#v005)
-    - [v0.0.4](#v004)
-    - [v0.0.3](#v003)
 - [License](#license)
 
 <!-- /MarkdownTOC -->
@@ -482,56 +472,7 @@ Please submit issues to the [jsen issue tracker in GitHub](https://github.com/bu
 
 ## Changelog
 
-### v0.3.2
-
-* Add in-browser support out of the box (#23)
-* Fix broken inlining of regular expressions containing forward slashes when running in the browser (#25)
-
-### v0.3.1
-
-* Add support for IE8
-
-### v0.3.0
-
-* Add support for default value population (#10)
-* Add support for custom messages per keyword (#18)
-
-### v0.2.0
-
-* Add support for custom format validators (#8, #9)
-* Add support for validating javascipt Date objects (#17) 
-
-### v0.1.2
-
-* Fix cannot dereference schema when ids change resolution scope (#14)
-
-### v0.1.1
-
-* Fix broken inlining of regular expressions containing slashes (#15)
-* Fix code generation breaks when object properties in schema are not valid identifiers (#16)
-
-### v0.1.0
-
-* Custom error messages defined in the schema
-* Append the required property name to the path in the error object for `required` and `dependencies` keywords (#7) 
-* Fix protocol-relative URIs are marked invalid (#13)
-* Update [JSON-Schema-Test-Suite](https://github.com/json-schema/JSON-Schema-Test-Suite) tests (#12)
-
-### v0.0.5
-
-* Improve generated validation code (#4)
-* Fail fast (#4)
-* Error reporting (#5)
-* Reduce the performance impact of logging validation errors (#4)
-
-### v0.0.4
-
-* Fix `multipleOf` doesn't validate data for decimal points (#1)
-
-### v0.0.3
-
-* Optimize performance of runtime code generation
-* Optimize performance of generated code
+Read [changelog.md](changelog.md)
 
 ## License
 
