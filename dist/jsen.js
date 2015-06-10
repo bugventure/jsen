@@ -805,7 +805,7 @@ function clone(obj) {
         return new RegExp(obj);
     }
     else if (objType === 'date') {
-        return new Date(obj);
+        return new Date(obj.toJSON());
     }
 
     return cloned;
