@@ -1,5 +1,12 @@
 ## Changelog
 
+### v0.4.0
+
+* Add external schema references (#20)
+* Fix cloning Date objects is broken in Firefox (#26)
+* Fix broken tests under IE9 (#27)
+* Fix `npm test` command to run mocha from the local node_modules
+
 ### v0.3.2
 
 * Add in-browser support out of the box (#23)
