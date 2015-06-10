@@ -438,7 +438,7 @@ Load from CDN, courtesy of [rawgit](https://rawgit.com/):
 To run [mocha][mocha] tests in node:
 
 ```bash
-$ npm test
+[~/github/jsen] $ npm test
 ```
 
 To run the same test suite in the browser, serve the `test/index.html` page in your node web server and navitate to `/test/` path from your browser. The example below uses [node-static](https://www.npmjs.com/package/node-static):
@@ -463,12 +463,21 @@ Source code coverage is provided by [istanbul][istanbul] and visible on [coveral
 
 To contribute to the project, fork the repo, edit and send a Pull Request. Please adhere to the coding guidelines enforced by the [jshint](https://github.com/bugventure/jsen/blob/master/.jshintrc) and [jscs](https://github.com/bugventure/jsen/blob/master/.jscsrc) code checkers.
 
+```bash
+[~/github/jsen] $ jshint lib/ && jscs lib/
+No code style errors found.
+```
+
 All tests must pass both in node and in the browser.
+
+```bash
+[~/github/jsen] $ npm test
+```
 
 To build the jsen browser-compatible distribution files, run:
 
 ```bash
-$ npm run build
+[~/github/jsen] $ npm run build
 ```
 
 This will update the files in the `/dist` folder.
