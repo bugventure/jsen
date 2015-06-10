@@ -426,6 +426,13 @@ NOTE: When `{ additionalProperties: false, copy: false }` is specified in the `b
 
 Browser-compatible builds of `jsen` (with the help of [browserify](http://npmjs.com/package/browserify)) can be found in the `dist` folder. These are built with the [standalone](https://github.com/substack/browserify-handbook#standalone) option of browserify, meaning they will work in node, the browser with globals, and AMD loader environments. In the browser, the `window.jsen` global object will refer to the validator builder function.
 
+Load from CDN, courtesy of [rawgit](https://rawgit.com/):
+
+```
+//cdn.rawgit.com/bugventure/jsen/v0.3.2/dist/jsen.js
+//cdn.rawgit.com/bugventure/jsen/v0.3.2/dist/jsen.min.js
+```
+
 ## Tests
 
 To run [mocha][mocha] tests in node:
