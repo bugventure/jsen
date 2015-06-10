@@ -2,12 +2,11 @@
 'use strict';
 
 var dir = 'draft4',
-    inBrowser = 'navigator' in this && navigator.userAgent, // jshint ignore: line
-    path = inBrowser ? null : require('path'),
-    fs = inBrowser ? null : require('fs'),
     assert = assert || require('assert'),
     jsen = jsen || require('../index.js'),
-    testDir = inBrowser ? './' + dir + '/' : path.resolve(__dirname, dir),
+    path = jsen.browser ? null : require('path'),
+    fs = jsen.browser ? null : require('fs'),
+    testDir = jsen.browser ? './' + dir + '/' : path.resolve(__dirname, dir),
     files,
     testCategories = [],
     error,
@@ -21,7 +20,7 @@ var dir = 'draft4',
     ],
     walk;
 
-if (inBrowser) {
+if (jsen.browser) {
     walk = function (dir) {
         var specs = [
                 'optional/bignum',

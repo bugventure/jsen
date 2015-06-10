@@ -172,6 +172,7 @@ var PATH_REPLACE_EXPR = /\[.+?\]/g,
     REGEX_ESCAPE_EXPR = /[\/]/g,
     VALID_IDENTIFIER_EXPR = /^[a-z_$][0-9a-z]*$/gi,
     INVALID_SCHEMA = 'jsen: invalid schema object',
+    browser = typeof window === 'object' && !!window.navigator,   // jshint ignore: line
     func = require('./func.js'),
     equal = require('./equal.js'),
     unique = require('./unique.js'),
@@ -181,10 +182,16 @@ var PATH_REPLACE_EXPR = /\[.+?\]/g,
     keywords = {};
 
 function inlineRegex(regex) {
-    var str = regex + '';
-    str = str.substr(1, str.length - 2);
+    var str = regex instanceof RegExp ? regex.toString() : new RegExp(regex).toString();
 
-    return '/' + str.replace(REGEX_ESCAPE_EXPR, '\\$&') + '/';
+    if (browser) {
+        return str;
+    }
+
+    str = str.substr(1, str.length - 2);
+    str = '/' + str.replace(REGEX_ESCAPE_EXPR, '\\$&') + '/';
+
+    return str;
 }
 
 function appendToPath(path, key) {
@@ -559,7 +566,7 @@ keywords.patternProperties = keywords.additionalProperties = function (context) 
     for (i = 0; i < patterns.length; i++) {
         pattern = patterns[i];
 
-        context.code('if ((' + inlineRegex(new RegExp(pattern)) + ').test(' + key + ')) {');
+        context.code('if ((' + inlineRegex(pattern) + ').test(' + key + ')) {');
 
         if (addPropsCheck) {
             context.code(found + ' = true');
@@ -1039,7 +1046,7 @@ function jsen(schema, options) {
 
                 if (format) {
                     if (typeof format === 'string' || format instanceof RegExp) {
-                        code('if (!(' + inlineRegex(new RegExp(format)) + ').test(' + context.path + ')) {');
+                        code('if (!(' + inlineRegex(format) + ').test(' + context.path + ')) {');
                         error('format');
                         code('}');
                     }
@@ -1080,6 +1087,7 @@ function jsen(schema, options) {
     return compile(schema);
 }
 
+jsen.browser = browser;
 jsen.clone = clone;
 jsen.equal = equal;
 jsen.unique = unique;

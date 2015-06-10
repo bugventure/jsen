@@ -4,7 +4,7 @@ var assert = assert || require('assert'),
     jsen = jsen || require('../index.js');
 
 describe('fixes', function () {
-    it('Fix broken inlining of regular expressions containing slashes (#15)', function () {
+    it('Fix broken inlining of regular expressions containing slashes (#15, #25)', function () {
         var schema = {
             type: 'string',
             pattern: '^/dev/[^/]+(/[^/]+)*$'
