@@ -868,7 +868,9 @@ function jsen(schema, options) {
         throw new Error(INVALID_SCHEMA);
     }
 
-    var resolver = new SchemaResolver(schema),
+    options = options || {};
+
+    var resolver = new SchemaResolver(schema, options.schemas),
         counter = 0,
         id = function () { return 'i' + (counter++); },
         funcache = {},
@@ -1041,7 +1043,7 @@ function jsen(schema, options) {
                 code('}');
             }
 
-            if (schema.format && options && options.formats) {
+            if (schema.format && options.formats) {
                 format = options.formats[schema.format];
 
                 if (format) {
@@ -1310,6 +1312,10 @@ function unescape(pointer) {
 }
 
 function refToPath(ref) {
+    if (ref.indexOf('#') < 0) {
+        return ref;
+    }
+
     var path = ref.split('#')[1];
 
     if (path) {
@@ -1340,15 +1346,33 @@ function refFromId(obj, ref) {
     return undefined;
 }
 
-function SchemaResolver(rootSchema) {
+function getResolvers(schemas) {
+    var keys = Object.keys(schemas),
+        resolvers = {},
+        key, i;
+
+    for (i = 0; i < keys.length; i++) {
+        key = keys[i];
+        resolvers[key] = new SchemaResolver(schemas[key]);
+    }
+
+    return resolvers;
+}
+
+function SchemaResolver(rootSchema, external) {  // jshint ignore: line
     this.rootSchema = rootSchema;
     this.cache = {};
     this.resolved = null;
+
+    this.resolvers = external && typeof external === 'object' ?
+        getResolvers(external) :
+        null;
 }
 
 SchemaResolver.prototype.resolveRef = function (ref) {
     var err = new Error(INVALID_SCHEMA_REFERENCE + ' ' + ref),
         root = this.rootSchema,
+        externalResolver,
         path,
         dest;
 
@@ -1368,6 +1392,14 @@ SchemaResolver.prototype.resolveRef = function (ref) {
         path = refToPath(ref);
 
         dest = path ? get(root, path) : root;
+    }
+
+    if (!dest && path && this.resolvers) {
+        externalResolver = get(this.resolvers, path);
+
+        if (externalResolver) {
+            dest = externalResolver.resolve(externalResolver.rootSchema);
+        }
     }
 
     if (!dest || typeof dest !== 'object') {

@@ -16,6 +16,7 @@ jsen (JSON Sentinel) validates your JSON objects using [JSON-Schema](http://json
 - [JSON Schema](#json-schema)
 - [Format Validation](#format-validation)
     - [Custom Formats](#custom-formats)
+- [External Schemas](#external-schemas)
 - [Errors](#errors)
     - [Custom Errors](#custom-errors)
     - [Custom Errors for Keywords](#custom-errors-for-keywords)
@@ -164,6 +165,23 @@ A custom format validator can be specified as:
 Unlike built-in format validators, custom format validators passed in the `options` are run for all data types, not only strings. This allows implementing custom validation behavior for arrays and objects in scenarios, where it is not possible or practical to use only JSON Schema keywords for validation rules.
 
 Custom format validation runs after all built-in keyword validators. This means that an error in any previous keyword validator will stop execution and any custom format validators won't run.
+
+## External Schemas
+
+You can use references to external schema objects through the `$ref` keyword. You pass external schemas in the `options.schemas` object:
+
+```javascript
+var external = { type: 'string' },
+    schema = { $ref: '#external' },
+    validate = jsen(schema, {
+        schemas: {
+            external: external
+        }
+    });
+
+validate('abc');    // true
+validate(123);      // false
+```
 
 ## Errors
 
