@@ -24,8 +24,10 @@ jsen (JSON Sentinel) validates your JSON objects using [JSON-Schema](http://json
     - [options.additionalProperties](#optionsadditionalproperties)
 - [In-Browser Usage](#in-browser-usage)
 - [Tests](#tests)
+- [Contributing](#contributing)
 - [Issues](#issues)
 - [Changelog](#changelog)
+    - [v0.3.2](#v032)
     - [v0.3.1](#v031)
     - [v0.3.0](#v030)
     - [v0.2.0](#v020)
@@ -460,11 +462,30 @@ serving "." at http://127.0.0.1:8080
 
 Source code coverage is provided by [istanbul][istanbul] and visible on [coveralls.io][coveralls-url].
 
+## Contributing
+
+To contribute to the project, fork the repo, edit and send a Pull Request. Please adhere to the coding guidelines enforced by the [jshint](https://github.com/bugventure/jsen/blob/master/.jshintrc) and [jscs](https://github.com/bugventure/jsen/blob/master/.jscsrc) code checkers.
+
+All tests must pass both in node and in the browser.
+
+To build the jsen browser-compatible distribution files, run:
+
+```bash
+$ npm run build
+```
+
+This will update the files in the `/dist` folder.
+
 ## Issues
 
 Please submit issues to the [jsen issue tracker in GitHub](https://github.com/bugventure/jsen/issues).
 
 ## Changelog
+
+### v0.3.2
+
+* Add in-browser support out of the box (#23)
+* Fix broken inlining of regular expressions containing forward slashes when running in the browser (#25)
 
 ### v0.3.1
 
