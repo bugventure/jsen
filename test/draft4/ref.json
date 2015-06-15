@@ -140,5 +140,40 @@
                 "valid": false
             }
         ]
+    },
+    {
+        "description": "ref with array and required",
+        "schema": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "foo": {"$ref": "#"}
+                },
+                "required": ["foo"]
+            }
+        },
+        "tests": [
+            {
+                "description": "match",
+                "data": [{"foo": []}],
+                "valid": true
+            },
+            {
+                "description": "recursive match",
+                "data": [{"foo": [{"foo": []}]}],
+                "valid": true
+            },
+            {
+                "description": "mismatch",
+                "data": [{"bar": []}],
+                "valid": false
+            },
+            {
+                "description": "recursive mismatch",
+                "data": [{"foo": [{"foo": []}, {"bar": []}]}],
+                "valid": false
+            }
+        ]
     }
 ]
