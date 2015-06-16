@@ -1,5 +1,9 @@
 ## Changelog
 
+### v0.4.1
+
+* Fix recursive calls to the same cached $ref validator resets the errors array (#30)
+
 ### v0.4.0
 
 * Add external schema references (#20)
