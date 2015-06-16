@@ -71,4 +71,23 @@ describe('fixes', function () {
             validate = jsen(schema);
         });
     });
+
+    it('Fix recursive calls to the same cached $ref validator resets the error object', function () {
+        var schema = {
+                type: 'array',
+                items: {
+                    type: 'object',
+                    properties: {
+                        foo: { $ref: '#' }
+                    },
+                    required: ['foo']
+                }
+            },
+            validate = jsen(schema);
+
+        assert(validate([{ foo: [] }]));
+        assert(validate([{ foo: [{ foo: [] }] }]));
+        assert(!validate([{ bar: [] }]));
+        assert(!validate([{ foo: [{ foo: [] }, { bar: [] }] }]));   // Bug! False positive
+    });
 });
