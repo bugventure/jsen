@@ -1,6 +1,6 @@
 {
   "name": "jsen",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "JSON-Schema validator built for speed",
   "author": "Veli Pehlivanov <bugventure@gmail.com>",
   "homepage": "https://github.com/bugventure/jsen",
