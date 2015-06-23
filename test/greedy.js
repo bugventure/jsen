@@ -4,8 +4,8 @@
 var assert = assert || require('assert'),
     jsen = jsen || require('../index.js');
 
-//describe('missing $ref', function () {
- //   it('passes validation with ignore missing $ref', function () {
+describe('missing $ref', function () {
+   it('passes validation with ignore missing $ref', function () {
         var schema = {
                 type: 'object',
                 properties: {
@@ -43,10 +43,10 @@ var assert = assert || require('assert'),
             },
             ret = validate(invalidTest, true);
 
-console.log(ret);
-console.log(validate);
-//        assert(ret1);    // true
-//        assert(!ret2);   // !false
-//        assert.deepEqual(validate.missing, ['#external1', '#external2', '#external31']);
-//    });
-//});
+        assert(!ret);    // false
+        assert.deepEqual(validate.errors, [ { path: 'test1', keyword: 'type' },{ path: 'test2', keyword: 'type' },{ path: 'test3', keyword: 'type' },{ path: 'test4', keyword: 'type' } ]);
+        ret = validate(invalidTest);
+        assert(!ret);    // false
+        assert.deepEqual(validate.errors, [ { path: 'test1', keyword: 'type' } ]);
+    });
+});
