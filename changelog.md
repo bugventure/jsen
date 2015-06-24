@@ -1,5 +1,9 @@
 ## Changelog
 
+### v0.5.0
+
+* Add greedy mode (#32, #33)
+
 ### v0.4.1
 
 * Fix recursive calls to the same cached $ref validator resets the errors array (#30)
