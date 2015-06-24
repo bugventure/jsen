@@ -984,8 +984,8 @@ function jsen(schema, options) {
                     code('errors.push(refs.' + varid + ')');
                 }
 
-                if (!noFailFast) {
-                    code('return false');
+                if (!noFailFast && !options.greedy) {
+                    code('return (validate.errors = errors) && false');
                 }
             }
 
@@ -1064,12 +1064,12 @@ function jsen(schema, options) {
             }
         }
 
-        var code = func('validate', 'data')
-            ('var errors = validate.errors = []');
+        var code = func('validate', 'data', 'greedyMode')
+            ('var errors = []');
 
         validate('data', schema);
 
-        code('return errors.length === 0');
+        code('return (validate.errors = errors) && errors.length === 0');
 
         compiled = code.compile(scope);
 

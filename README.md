@@ -20,6 +20,7 @@ jsen (JSON Sentinel) validates your JSON objects using [JSON-Schema](http://json
 - [Errors](#errors)
     - [Custom Errors](#custom-errors)
     - [Custom Errors for Keywords](#custom-errors-for-keywords)
+    - [Greedy Validation](#greedy-validation)
 - [Gathering Default Values](#gathering-default-values)
     - [options.copy](#optionscopy)
     - [options.additionalProperties](#optionsadditionalproperties)
@@ -335,6 +336,47 @@ console.log(validate.errors);
 ```
 
 **NOTE**: The following keywords are never assigned to error objects, and thus do not support custom error messages: `items`, `properties`, `patternProperties`, `dependecies` (when defining a [schema dependency](http://json-schema.org/latest/json-schema-validation.html#anchor70)) and `allOf`.
+
+### Greedy Validation
+
+For performance, by default, JSEN returns the first encountered error and bails out any further execution.
+
+With the `options.greedy` flag passed to the builder function, the compiled validator will try to validate as much as possible, providing more info in the `errors` array.
+
+```javascript
+var schema = {
+        type: 'object',
+        properties: {
+            firstName: {
+                type: 'string',
+                minLength: 1,
+                maxLength: 20
+            },
+            lastName: {
+                type: 'string',
+                minLength: 2,
+                maxLength: 50
+            },
+            age: {
+                type: 'number',
+                minimum: 18,
+                maximum: 100
+            }
+        },
+        required: ['firstName', 'lastName', 'age']
+    };
+
+var validate = jsen(schema, { greedy: true });  // enable greedy validation
+
+validate({ firstName: null, lastName: '' });
+
+console.log(validate.errors);
+/* Output:
+[ { path: 'firstName', keyword: 'type' },
+  { path: 'lastName', keyword: 'minLength' },
+  { path: 'age', keyword: 'required' } ]
+*/
+```
 
 ## Gathering Default Values
 
