@@ -1064,7 +1064,7 @@ function jsen(schema, options) {
             }
         }
 
-        var code = func('validate', 'data', 'greedyMode')
+        var code = func('validate', 'data')
             ('var errors = []');
 
         validate('data', schema);
