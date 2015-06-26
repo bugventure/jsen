@@ -1,5 +1,9 @@
 ## Changelog
 
+### v0.5.1
+
+* Performance improvement (#35)
+
 ### v0.5.0
 
 * Add greedy mode (#32, #33)

@@ -551,7 +551,7 @@ keywords.patternProperties = keywords.additionalProperties = function (context) 
     for (i = 0; i < propKeys.length; i++) {
         propKey = propKeys[i];
 
-        context.code('if (' + key + ' === "' + propKey + '") {');
+        context.code((i ? 'else ' : '') + 'if (' + key + ' === "' + propKey + '") {');
 
         if (addPropsCheck) {
             context.code(found + ' = true');
