@@ -263,4 +263,52 @@ describe('format', function () {
             assert.strictEqual(callCount, 1);
         });
     });
+
+    describe('common scenarios', function () {
+        it('verify passwords match', function () {
+            var schema = {
+                    description: 'User account creation form',
+                    type: 'object',
+                    properties: {
+                        password: {
+                            type: 'string',
+                            minLength: 8
+                        },
+                        password_confirm: {
+                            type: 'string',
+                            minLength: 8
+                        }
+                    },
+                    format: 'passwordsMatch'
+                },
+                options = {
+                    formats: {
+                        passwordsMatch: function (obj) {
+                            callCount++;
+                            return obj.password === obj.password_confirm;
+                        }
+                    }
+                },
+                data = {
+                    password: '1234567',
+                    password_confirm: '1234567'
+                },
+                validate = jsen(schema, options),
+                callCount = 0;
+
+            assert(!validate(data));                // minLength validator failed
+            assert.strictEqual(callCount, 0);
+
+            data.password += '8';
+            data.password_confirm += '9';
+
+            assert(!validate(data));                // custom validator failed
+            assert.strictEqual(callCount, 1);
+
+            data.password_confirm = data.password;
+
+            assert(validate(data));                 // OK
+            assert.strictEqual(callCount, 2);
+        });
+    });
 });
