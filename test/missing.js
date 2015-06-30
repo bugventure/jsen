@@ -55,10 +55,8 @@ describe('missing $ref', function () {
 
         ret = validate(missingTest);
         assert(ret);    // true
-        assert.deepEqual(validate.missing, ['#external11', '#external3']);
 
         ret = validate(invalidTest);
         assert(!ret);   // !false
-        assert.deepEqual(validate.missing, ['#external11']);
     });
 });
