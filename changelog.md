@@ -1,7 +1,8 @@
 ## Changelog
 
-### v0.5.1
+### v0.6.0
 
+* Add an option to ignore missing references (#37)
 * Performance improvement (#35)
 
 ### v0.5.0

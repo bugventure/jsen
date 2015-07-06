@@ -870,7 +870,8 @@ function jsen(schema, options) {
 
     options = options || {};
 
-    var resolver = new SchemaResolver(schema, options.schemas),
+    var missing$Ref = options.missing$Ref || false,
+        resolver = new SchemaResolver(schema, options.schemas, missing$Ref),
         counter = 0,
         id = function () { return 'i' + (counter++); },
         funcache = {},
@@ -1359,10 +1360,11 @@ function getResolvers(schemas) {
     return resolvers;
 }
 
-function SchemaResolver(rootSchema, external) {  // jshint ignore: line
+function SchemaResolver(rootSchema, external, missing$Ref) {  // jshint ignore: line
     this.rootSchema = rootSchema;
     this.cache = {};
     this.resolved = null;
+    this.missing$Ref = missing$Ref;
 
     this.resolvers = external && typeof external === 'object' ?
         getResolvers(external) :
@@ -1403,7 +1405,11 @@ SchemaResolver.prototype.resolveRef = function (ref) {
     }
 
     if (!dest || typeof dest !== 'object') {
-        throw err;
+        if (this.missing$Ref) {
+            dest = {};
+        } else {
+            throw err;
+        }
     }
 
     if (this.cache[ref] === dest) {
