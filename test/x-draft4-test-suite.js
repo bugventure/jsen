@@ -1,12 +1,12 @@
 /* global describe, it */
 'use strict';
 
-var dir = 'draft4',
+var dir = '../node_modules/json-schema-test-suite/tests/draft4',
     assert = assert || require('assert'),
     jsen = jsen || require('../index.js'),
     path = jsen.browser ? null : require('path'),
     fs = jsen.browser ? null : require('fs'),
-    testDir = jsen.browser ? './' + dir + '/' : path.resolve(__dirname, dir),
+    testDir = jsen.browser ? dir + '/' : path.resolve(__dirname, dir),
     files,
     testCategories = [],
     error,

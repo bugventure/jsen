@@ -23,10 +23,11 @@
     "coverage": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls && rm -rf ./coverage"
   },
   "devDependencies": {
-    "mocha": "1.x",
+    "browserify": "10.x",
     "coveralls": "2.x",
     "istanbul": "0.x",
-    "browserify": "10.x",
+    "json-schema-test-suite": "0.0.10",
+    "mocha": "1.x",
     "uglify": "0.x"
   }
 }
