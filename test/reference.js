@@ -4,6 +4,69 @@
 var assert = assert || require('assert'),
     jsen = jsen || require('../index.js');
 
+// Reference: https://tools.ietf.org/html/rfc6901
+describe('JSON Pointer', function () {
+    var doc = {
+            foo: ['bar', 'baz'],
+            '': 0,
+            'a/b': 1,
+            'c%d': 2,
+            'e^f': 3,
+            'g|h': 4,
+            'i\\j': 5,
+            'k\"l': 6,
+            ' ': 7,
+            'm~n': 8,
+            'k\'l': 9
+        },
+        expected = [doc, doc.foo, 'bar', 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        i;
+
+    it('resolver conforms to JSON Pointer spec', function () {
+        var paths = [
+            '',
+            '/foo',
+            '/foo/0',
+            '/',
+            '/a~1b',
+            '/c%d',
+            '/e^f',
+            '/g|h',
+            '/i\\j',
+            '/k\"l',
+            '/ ',
+            '/m~0n',
+            '/k\'l'
+        ];
+
+        for (i = 0; i < paths.length; i++) {
+            assert.strictEqual(expected[i], jsen.resolve(doc, paths[i]));
+        }
+    });
+
+    it('decodes URI-encoded pointers', function () {
+        var paths = [
+            '#',
+            '#/foo',
+            '#/foo/0',
+            '#/',
+            '#/a~1b',
+            '#/c%25d',
+            '#/e%5Ef',
+            '#/g%7Ch',
+            '#/i%5Cj',
+            '#/k%22l',
+            '#/%20',
+            '#/m~0n',
+            '#/k\'l'
+        ];
+
+        for (i = 0; i < paths.length; i++) {
+            assert.strictEqual(expected[i], jsen.resolve(doc, paths[i]));
+        }
+    });
+});
+
 describe('$ref', function () {
     it('throws if string is not in correct format', function () {
         assert.throws(function () {
