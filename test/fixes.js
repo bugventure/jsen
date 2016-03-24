@@ -15,6 +15,17 @@ describe('fixes', function () {
         });
     });
 
+    it('Fix broken inlining of regular expressions containing slashes 2 (#46)', function () {
+        var schema = {
+            type: 'string',
+            pattern: '^(/[^/ ]*)+/?$'
+        };
+
+        assert.doesNotThrow(function () {
+            jsen(schema);
+        });
+    });
+
     it('Fix code generation breaks when object properties in schema are not valid identifiers (#16)', function () {
         var schema = {
                 type: 'object',
