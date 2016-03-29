@@ -119,4 +119,58 @@ describe('fixes', function () {
             });
         });
     });
+
+    it('Fix build() doesn\'t work with allOf (#40)', function () {
+        var schemaA = {
+                $schema: 'http://json-schema.org/draft-04/schema#',
+                id: 'http://jsen.bis/schemaA',
+                type: 'object',
+                properties: {
+                    firstName: { type: 'string' },
+                    lastName: { type: 'string'}
+                },
+                required: ['firstName', 'lastName']
+            },
+            schemaB = {
+                $schema: 'http://json-schema.org/draft-04/schema#',
+                id: 'http://jsen.bis/schemaB',
+                type: 'object',
+                properties: {
+                    email: { type: 'string' },
+                    contactType: { type: 'string', default: 'personal' }
+                },
+                required: ['email']
+            },
+            mySchema = {
+                $schema: 'http://json-schema.org/draft-04/schema#',
+                id: 'http://jsen.biz/mySchema',
+                type: 'object',
+                allOf: [
+                    { $ref: 'http://jsen.bis/schemaA' },
+                    { $ref: 'http://jsen.bis/schemaB' }
+                ]
+            },
+            baseSchemas = {
+                'http://jsen.bis/schemaA': schemaA,
+                'http://jsen.bis/schemaB': schemaB
+            },
+            data = {
+                firstName: 'bunk',
+                lastName: 'junk',
+                email: 'asdf@biz',
+                funky: true
+            },
+            validator = jsen(mySchema, { schemas: baseSchemas, greedy: true });
+
+        assert(validator(data));
+
+        validator.build(data, { additionalProperties: false, copy: false });
+
+        assert.deepEqual(data, {
+            firstName: 'bunk',
+            lastName: 'junk',
+            email: 'asdf@biz',
+            contactType: 'personal'
+        });
+    });
 });
