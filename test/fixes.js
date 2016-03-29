@@ -101,4 +101,22 @@ describe('fixes', function () {
         assert(!validate([{ bar: [] }]));
         assert(!validate([{ foo: [{ foo: [] }, { bar: [] }] }]));   // Bug! False positive
     });
+
+    it('Fix cannot build validator function with nested refs (#48, #50)', function () {
+        assert.doesNotThrow(function () {
+            jsen({
+                a: {
+                    properties: {
+                        b: {
+                            $ref: '#/c'
+                        }
+                    }
+                },
+                c: {
+                    type: 'any'
+                },
+                $ref: '#/a'
+            });
+        });
+    });
 });
