@@ -1,5 +1,12 @@
 ## Changelog
 
+### v0.6.1
+
+* Fix various RegExp escaping issues in node v4.0 and above (#47)
+* Fix build() function doesn't apply default values or remove additional properties when using 'allOf' keyword (#40)
+* Make $ref resolving conform strictly to JSON Pointer spec (#49)
+* Fix errors resolving nested $refs (#50)
+
 ### v0.6.0
 
 * Add an option to ignore missing references (#37)
