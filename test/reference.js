@@ -22,29 +22,7 @@ describe('JSON Pointer', function () {
         expected = [doc, doc.foo, 'bar', 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
         i;
 
-    it('resolver conforms to JSON Pointer spec', function () {
-        var paths = [
-            '',
-            '/foo',
-            '/foo/0',
-            '/',
-            '/a~1b',
-            '/c%d',
-            '/e^f',
-            '/g|h',
-            '/i\\j',
-            '/k\"l',
-            '/ ',
-            '/m~0n',
-            '/k\'l'
-        ];
-
-        for (i = 0; i < paths.length; i++) {
-            assert.strictEqual(expected[i], jsen.resolve(doc, paths[i]));
-        }
-    });
-
-    it('decodes URI-encoded pointers', function () {
+    it('resolver conforms to JSON Pointer spec and decodes URI-encoded pointers', function () {
         var paths = [
             '#',
             '#/foo',
@@ -64,6 +42,61 @@ describe('JSON Pointer', function () {
         for (i = 0; i < paths.length; i++) {
             assert.strictEqual(expected[i], jsen.resolve(doc, paths[i]));
         }
+    });
+
+    it('resolver does not parse $refs without # as JSON pointer', function () {
+        var schema = {
+                id: 'http://jsen.bis/schemaA',
+                'http://jsen.bis/schemaB': {
+                    type: 'number'
+                },
+                type: 'object',
+                properties: {
+                    foo: { $ref: 'http://jsen.bis/schemaB' }
+                }
+            },
+            validate = jsen(schema);
+
+        assert.strictEqual(schema['http://jsen.bis/schemaB'], jsen.resolve(schema, 'http://jsen.bis/schemaB'));
+
+        assert(validate({ foo: 123 }));
+        assert(!validate({ foo: '123' }));
+    });
+
+    it('resolver does not parse $refs that do not start with `#` as JSON pointer', function () {
+        var schema = {
+                id: 'http://jsen.bis/schemaA',
+                definitions: {
+                    foo: {
+                        id: 'http://jsen.bis/schemaA#bar',
+                        type: 'string'
+                    },
+                    foo2: { type: 'object' },
+                    baz: { type: 'array' }
+                },
+                bar: { type: 'number' },
+                '/definitions/baz': { type: 'boolean' },
+                'http://jsen.bis/schemaA#/definitions/foo2': { type: 'null' },
+                properties: {
+                    foo: { $ref: 'http://jsen.bis/schemaA#bar' },
+                    foo2: { $ref: 'http://jsen.bis/schemaA#/definitions/foo2' },
+                    bar: { $ref: '#/bar' },
+                    baz: { $ref: '/definitions/baz' }
+                }
+            },
+            validate = jsen(schema);
+
+        assert(validate({ foo: 'abc' }));
+        assert(!validate({ foo: 123 }));
+
+        assert(validate({ foo2: null }));
+        assert(!validate({ foo2: {} }));
+
+        assert(validate({ bar: 123 }));
+        assert(!validate({ bar: '123' }));
+
+        assert(validate({ baz: false }));
+        assert(!validate({ baz: [] }));
     });
 });
 
