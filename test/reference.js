@@ -2,7 +2,8 @@
 'use strict';
 
 var assert = assert || require('assert'),
-    jsen = jsen || require('../index.js');
+    jsen = jsen || require('../index.js'),
+    SchemaResolver = require('../lib/resolver.js');
 
 // Reference: https://tools.ietf.org/html/rfc6901
 describe('JSON Pointer', function () {
@@ -40,7 +41,7 @@ describe('JSON Pointer', function () {
         ];
 
         for (i = 0; i < paths.length; i++) {
-            assert.strictEqual(expected[i], jsen.resolve(doc, paths[i]));
+            assert.strictEqual(expected[i], SchemaResolver.resolvePointer(doc, paths[i]));
         }
     });
 
@@ -57,7 +58,7 @@ describe('JSON Pointer', function () {
             },
             validate = jsen(schema);
 
-        assert.strictEqual(schema['http://jsen.bis/schemaB'], jsen.resolve(schema, 'http://jsen.bis/schemaB'));
+        assert.strictEqual(schema['http://jsen.bis/schemaB'], SchemaResolver.resolvePointer(schema, 'http://jsen.bis/schemaB'));
 
         assert(validate({ foo: 123 }));
         assert(!validate({ foo: '123' }));
