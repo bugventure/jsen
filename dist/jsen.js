@@ -2,7 +2,7 @@
  * jsen
  * https://github.com/bugventure/jsen
  *
- * Copyright (c) 2015 Veli Pehlivanov <bugventure@gmail.com>
+ * Copyright (c) 2016 Veli Pehlivanov <bugventure@gmail.com>
  * Licensed under the MIT license
  */
 
@@ -165,6 +165,7 @@ module.exports = function func() {
     return builder;
 };
 },{}],5:[function(require,module,exports){
+(function (process){
 'use strict';
 
 var PATH_REPLACE_EXPR = /\[.+?\]/g,
@@ -173,6 +174,7 @@ var PATH_REPLACE_EXPR = /\[.+?\]/g,
     VALID_IDENTIFIER_EXPR = /^[a-z_$][0-9a-z]*$/gi,
     INVALID_SCHEMA = 'jsen: invalid schema object',
     browser = typeof window === 'object' && !!window.navigator,   // jshint ignore: line
+    nodev0 = typeof process === 'object' && process.version.split('.')[0] === 'v0',
     func = require('./func.js'),
     equal = require('./equal.js'),
     unique = require('./unique.js'),
@@ -184,7 +186,7 @@ var PATH_REPLACE_EXPR = /\[.+?\]/g,
 function inlineRegex(regex) {
     var str = regex instanceof RegExp ? regex.toString() : new RegExp(regex).toString();
 
-    if (browser) {
+    if (!nodev0) {
         return str;
     }
 
@@ -811,8 +813,50 @@ function clone(obj) {
     return cloned;
 }
 
-function build(schema, def, additional, resolver) {
-    var defType, defValue, key, i;
+function PropertyMarker() {
+    this.objects = [];
+    this.properties = [];
+}
+
+PropertyMarker.prototype.mark = function (obj, key) {
+    var index = this.objects.indexOf(obj),
+        prop;
+
+    if (index < 0) {
+        this.objects.push(obj);
+
+        prop = {};
+        prop[key] = 1;
+
+        this.properties.push(prop);
+
+        return;
+    }
+
+    prop = this.properties[index];
+
+    prop[key] = prop[key] ? prop[key] + 1 : 1;
+};
+
+PropertyMarker.prototype.deleteDuplicates = function () {
+    var key, i;
+
+    for (i = 0; i < this.properties.length; i++) {
+        for (key in this.properties[i]) {
+            if (this.properties[i][key] > 1) {
+                delete this.objects[i][key];
+            }
+        }
+    }
+};
+
+PropertyMarker.prototype.dispose = function () {
+    this.objects.length = 0;
+    this.properties.length = 0;
+};
+
+function build(schema, def, additional, resolver, parentMarker) {
+    var defType, defValue, key, i, propertyMarker;
 
     if (type(schema) !== 'object') {
         return def;
@@ -839,7 +883,13 @@ function build(schema, def, additional, resolver) {
             if (!(key in schema.properties) &&
                 (schema.additionalProperties === false ||
                 (additional === false && !schema.additionalProperties))) {
-                delete def[key];
+
+                if (parentMarker) {
+                    parentMarker.mark(def, key);
+                }
+                else {
+                    delete def[key];
+                }
             }
         }
     }
@@ -858,6 +908,16 @@ function build(schema, def, additional, resolver) {
                 def[i] = build(schema.items, def[i], additional, resolver);
             }
         }
+    }
+    else if (type(schema.allOf) === 'array' && schema.allOf.length) {
+        propertyMarker = new PropertyMarker();
+
+        for (i = 0; i < schema.allOf.length; i++) {
+            def = build(schema.allOf[i], def, additional, resolver, propertyMarker);
+        }
+
+        propertyMarker.deleteDuplicates();
+        propertyMarker.dispose();
     }
 
     return def;
@@ -1094,10 +1154,12 @@ jsen.browser = browser;
 jsen.clone = clone;
 jsen.equal = equal;
 jsen.unique = unique;
+jsen.resolve = SchemaResolver.resolvePointer;
 
 module.exports = jsen;
 
-},{"./equal.js":2,"./formats.js":3,"./func.js":4,"./resolver.js":7,"./unique.js":8}],6:[function(require,module,exports){
+}).call(this,require('_process'))
+},{"./equal.js":2,"./formats.js":3,"./func.js":4,"./resolver.js":7,"./unique.js":8,"_process":9}],6:[function(require,module,exports){
 module.exports={
     "id": "http://json-schema.org/draft-04/schema#",
     "$schema": "http://json-schema.org/draft-04/schema#",
@@ -1256,78 +1318,54 @@ module.exports={
 'use strict';
 
 var metaschema = require('./metaschema.json'),
-    refRegex = /#?(\/?\w+)*$/,
     INVALID_SCHEMA_REFERENCE = 'jsen: invalid schema reference';
 
-function get(obj, key) {
-    var parts = key.split('.'),
-        subobj,
-        remaining;
-
-    if (parts.length === 1) {
-        // simple key
-        return obj[key];
+function get(obj, path) {
+    if (!path.length) {
+        return obj;
     }
 
-    // compound and nested properties
-    // e.g. key('nested.key', { nested: { key: 123 } }) === 123
-    // e.g. key('compount.key', { 'compound.key': 456 }) === 456
-    while (parts.length && obj !== undefined && obj !== null) {
-        // take a part from the front
-        remaining = parts.slice(0);
-        subobj = undefined;
+    var key = path.shift(),
+        val;
 
-        // try to match larger compound keys containing dots
-        while (remaining.length && subobj === undefined) {
-            subobj = obj[remaining.join('.')];
-
-            if (subobj === undefined) {
-                remaining.pop();
-            }
-        }
-
-        // if there is a matching larger compount key, use that
-        if (subobj !== undefined) {
-            obj = subobj;
-
-            // remove keys from the parts, respectively
-            while (remaining.length) {
-                remaining.shift();
-                parts.shift();
-            }
-        }
-        else {
-            // treat like normal simple keys
-            obj = obj[parts.shift()];
-        }
+    if (obj && typeof obj === 'object' && obj.hasOwnProperty(key)) {
+        val = obj[key];
     }
 
-    return obj;
-}
+    if (path.length) {
+        if (val && typeof val === 'object') {
+            return get(val, path);
+        }
 
-// http://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-08#section-3
-function unescape(pointer) {
-    return decodeURIComponent(pointer)
-        .replace(/~1/g, '/')
-        .replace(/~0/g, '~');
+        return undefined;
+    }
+
+    return val;
 }
 
 function refToPath(ref) {
-    if (ref.indexOf('#') < 0) {
-        return ref;
+    var index = ref.indexOf('#'),
+        path;
+
+    if (index !== 0) {
+        return [ref];
     }
 
-    var path = ref.split('#')[1];
+    ref = ref.substr(index + 1);
 
-    if (path) {
-        path = path
-            .split('/')
-            .map(unescape)
-            .join('.');
+    if (!ref) {
+        return [];
+    }
 
-        if (path[0] === '.') {
-            path = path.substr(1);
-        }
+    path = ref.split('/').map(function (segment) {
+        // Reference: http://tools.ietf.org/html/draft-ietf-appsawg-json-pointer-08#section-3
+        return decodeURIComponent(segment)
+            .replace(/~1/g, '/')
+            .replace(/~0/g, '~');
+    });
+
+    if (ref[0] === '/') {
+        path.shift();
     }
 
     return path;
@@ -1362,8 +1400,8 @@ function getResolvers(schemas) {
 
 function SchemaResolver(rootSchema, external, missing$Ref) {  // jshint ignore: line
     this.rootSchema = rootSchema;
+    this.resolvedRootSchema = null;
     this.cache = {};
-    this.resolved = null;
     this.missing$Ref = missing$Ref;
 
     this.resolvers = external && typeof external === 'object' ?
@@ -1374,11 +1412,12 @@ function SchemaResolver(rootSchema, external, missing$Ref) {  // jshint ignore: 
 SchemaResolver.prototype.resolveRef = function (ref) {
     var err = new Error(INVALID_SCHEMA_REFERENCE + ' ' + ref),
         root = this.rootSchema,
+        resolvedRoot = this.resolvedRootSchema,
         externalResolver,
         path,
         dest;
 
-    if (!ref || typeof ref !== 'string' || !refRegex.test(ref)) {
+    if (!ref || typeof ref !== 'string') {
         throw err;
     }
 
@@ -1386,17 +1425,27 @@ SchemaResolver.prototype.resolveRef = function (ref) {
         dest = metaschema;
     }
 
-    if (!dest) {
+    if (dest === undefined && resolvedRoot) {
+        dest = refFromId(resolvedRoot, ref);
+    }
+
+    if (dest === undefined) {
         dest = refFromId(root, ref);
     }
 
-    if (!dest) {
+    if (dest === undefined) {
         path = refToPath(ref);
 
-        dest = path ? get(root, path) : root;
+        if (resolvedRoot) {
+            dest = get(resolvedRoot, path.slice(0));
+        }
+
+        if (dest === undefined) {
+            dest = get(root, path.slice(0));
+        }
     }
 
-    if (!dest && path && this.resolvers) {
+    if (dest === undefined && path.length && this.resolvers) {
         externalResolver = get(this.resolvers, path);
 
         if (externalResolver) {
@@ -1404,7 +1453,7 @@ SchemaResolver.prototype.resolveRef = function (ref) {
         }
     }
 
-    if (!dest || typeof dest !== 'object') {
+    if (dest === undefined || typeof dest !== 'object') {
         if (this.missing$Ref) {
             dest = {};
         } else {
@@ -1437,18 +1486,22 @@ SchemaResolver.prototype.resolve = function (schema) {
         return schema;
     }
 
-    if (resolved) {
+    if (resolved !== undefined) {
         return resolved;
     }
 
     resolved = this.resolveRef(ref);
 
     if (schema === this.rootSchema && schema !== resolved) {
-        // substitute the resolved root schema
-        this.rootSchema = resolved;
+        // cache the resolved root schema
+        this.resolvedRootSchema = resolved;
     }
 
     return resolved;
+};
+
+SchemaResolver.resolvePointer = function (obj, pointer) {
+    return get(obj, refToPath(pointer));
 };
 
 module.exports = SchemaResolver;
@@ -1474,5 +1527,98 @@ module.exports = function unique(arr) {
 };
 
 module.exports.findIndex = findIndex;
-},{"./equal.js":2}]},{},[1])(1)
+},{"./equal.js":2}],9:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = setTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    clearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}]},{},[1])(1)
 });
