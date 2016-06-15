@@ -705,7 +705,35 @@ describe('build', function () {
             assert.deepEqual(actual, expected);
         });
 
-        it('schema.additionalProperties takes precedence', function () {
+        it('build options.additionalProperties false takes precedence', function () {
+            var schema = {
+                    additionalProperties: true,
+                    properties: {
+                        foo: {}
+                    }
+                },
+                initial = { foo: 1, bar: 2 },
+                expected = { foo: 1 },
+                validate = jsen(schema);
+
+            assert.deepEqual(validate.build(initial, { additionalProperties: false }), expected);
+        });
+
+        it('build options.additionalProperties true takes precedence', function () {
+            var schema = {
+                    additionalProperties: false,
+                    properties: {
+                        foo: {}
+                    }
+                },
+                initial = { foo: 1, bar: 2 },
+                expected = { foo: 1, bar: 2 },
+                validate = jsen(schema);
+
+            assert.deepEqual(validate.build(initial, { additionalProperties: true }), expected);
+        });
+
+        it('build options.additionalProperties undefined falls back to schema.additionalProperties true', function () {
             var schema = {
                     additionalProperties: true,
                     properties: {
@@ -716,7 +744,21 @@ describe('build', function () {
                 expected = { foo: 1, bar: 2 },
                 validate = jsen(schema);
 
-            assert.deepEqual(validate.build(initial, { additionalProperties: false }), expected);
+            assert.deepEqual(validate.build(initial, { additionalProperties: void 0 }), expected);
+        });
+
+        it('build options.additionalProperties undefined falls back to schema.additionalProperties false', function () {
+            var schema = {
+                    additionalProperties: false,
+                    properties: {
+                        foo: {}
+                    }
+                },
+                initial = { foo: 1, bar: 2 },
+                expected = { foo: 1 },
+                validate = jsen(schema);
+
+            assert.deepEqual(validate.build(initial, { additionalProperties: void 0 }), expected);
         });
     });
 });
