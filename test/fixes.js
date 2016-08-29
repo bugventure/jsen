@@ -173,4 +173,36 @@ describe('fixes', function () {
             contactType: 'personal'
         });
     });
+
+    it('Fix requiredMessage doesn\'t work with external schema', function () {
+        var personSchema = {
+                $schema: 'http://json-schema.org/draft-04/schema#',
+                type: 'object',
+                properties: {
+                    name: {
+                        $ref: '#/name'
+                    }
+                },
+                required: ['name']
+            },
+            definitions = {
+                $schema: 'http://json-schema.org/draft-04/schema#',
+                name: {
+                    type: 'string',
+                    maxLength: 100,
+                    pattern: '^[a-zA-Z]+$',
+                    invalidMessage: 'Error: Name is invalid - must be <= 100 in length and contain alphabetic characters only',
+                    requiredMessage: 'Error: Missing name'
+                }
+            },
+            validate = jsen(personSchema, { schemas: definitions }),
+            valid = validate({});
+
+        assert(!valid);
+        assert.strictEqual(validate.errors[0].message, definitions.name.requiredMessage);
+
+        valid = validate({ name: '123' });
+        assert(!valid);
+        assert.strictEqual(validate.errors[0].message, definitions.name.invalidMessage);
+    });
 });
