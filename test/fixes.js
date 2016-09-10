@@ -205,4 +205,34 @@ describe('fixes', function () {
         assert(!valid);
         assert.strictEqual(validate.errors[0].message, definitions.name.invalidMessage);
     });
+
+    it('Fix validation error when usign additionalProperties (#56)', function () {
+        var schema = {
+                $schema: 'http://json-schema.org/draft-04/schema#',
+                type: 'object',
+                additionalProperties: {
+                    type: 'object',
+                    properties: {
+                        label: {
+                            type: 'string'
+                        }
+                    },
+                    additionalProperties: false
+                }
+            },
+            data = {
+                one: { label: '1' },
+                two: { number: '2' }
+            },
+            validate = jsen(schema);
+
+        assert(!validate(data));
+
+        data = {
+            one: { number: '1' },
+            two: { label: '2' }
+        };
+
+        assert(!validate(data));
+    });
 });
