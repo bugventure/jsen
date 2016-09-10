@@ -245,6 +245,26 @@ console.log(validate.errors);
 */
 ```
 
+When the `additionalProperties` keyword fails validation, the respective error object contains a key by the same name, specifying the property name that was found in the validated object, but was fobidden in the schema:
+
+```javascript
+var schema = {
+    properties: { foo: {} },
+    additionalProperties: false
+}
+
+var validate = jsen(schema);
+
+validate({ foo: 'foo', bar: 'bar' });   // false
+
+console.log(validate.errors);
+/* Output:
+[ { path: '',
+    keyword: 'additionalProperties',
+    additionalProperties: 'bar' } ]
+*/
+```
+
 The errors array is replaced on every call of the validator function. You can safely modify the array without affecting successive validation runs.
 
 ### Custom Errors
