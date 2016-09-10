@@ -361,6 +361,50 @@ describe('errors', function () {
             assert.strictEqual(validate.errors[0].path, 'a.0.b');
             assert.strictEqual(validate.errors[0].keyword, 'dependencies');
         });
+
+        it('adds additionalProperties to object', function () {
+            var schema = {
+                    type: 'object',
+                    properties: {
+                        a: {
+                            type: 'object',
+                            properties: {
+                                foo: {}
+                            },
+                            additionalProperties: false
+                        }
+                    }
+                },
+                data = {
+                    a: {
+                        foo: 'foo',
+                        bar: 'bar',
+                        baz: 'baz'
+                    }
+                },
+                validate = jsen(schema),
+                valid = validate(data);
+
+            assert(!valid);
+            assert.strictEqual(validate.errors.length, 1);
+            assert.strictEqual(validate.errors[0].path, 'a');
+            assert.strictEqual(validate.errors[0].keyword, 'additionalProperties');
+            assert.strictEqual(validate.errors[0].additionalProperties, 'bar');
+
+            validate = jsen(schema, { greedy: true });
+            valid = validate(data);
+
+            assert(!valid);
+            assert.strictEqual(validate.errors.length, 2);
+            assert.strictEqual(validate.errors[0].path, 'a');
+            assert.strictEqual(validate.errors[0].keyword, 'additionalProperties');
+            assert.strictEqual(validate.errors[0].additionalProperties, 'bar');
+            assert.strictEqual(validate.errors[1].path, 'a');
+            assert.strictEqual(validate.errors[1].keyword, 'additionalProperties');
+            assert.strictEqual(validate.errors[1].additionalProperties, 'baz');
+
+            assert.notStrictEqual(validate.errors[0], validate.errors[1]);
+        });
     });
 
     describe('multiple errors', function () {
