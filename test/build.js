@@ -718,5 +718,19 @@ describe('build', function () {
 
             assert.deepEqual(validate.build(initial, { additionalProperties: false }), expected);
         });
+
+        it('"always" takes precedence over schema.additionalProperties', function () {
+            var schema = {
+                    additionalProperties: false,
+                    properties: {
+                        foo: {}
+                    }
+                },
+                initial = { foo: 1, bar: 2 },
+                expected = { foo: 1, bar: 2 },
+                validate = jsen(schema);
+
+            assert.deepEqual(validate.build(initial, { additionalProperties: 'always' }), expected);
+        });
     });
 });
