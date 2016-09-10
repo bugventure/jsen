@@ -235,4 +235,76 @@ describe('fixes', function () {
 
         assert(!validate(data));
     });
+
+    it('Fix validation error with arrays and oneOf (#55)', function () {
+        var schema = {
+                $schema: 'http://json-schema.org/draft-04/schema#',
+                type: 'object',
+                definitions: {
+                    array_of_elements: {
+                        properties: {
+                            the_array: {
+                                type: 'array',
+                                items: {
+                                    oneOf: [
+                                        { $ref: '#/definitions/element_of_type_one' },
+                                        { $ref: '#/definitions/element_of_type_two' }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    element_of_type_one: {
+                        type: 'object',
+                        properties: {
+                            type: {
+                                enum: ['one']
+                            }
+                        }
+                    },
+                    element_of_type_two: {
+                        type: 'object',
+                        properties: {
+                            type: {
+                                enum: ['two']
+                            }
+                        }
+                    }
+                },
+                $ref: '#/definitions/array_of_elements'
+            },
+            data = {
+                the_array: [
+                    { type: 'two' },
+                    { type: 'one' }
+                ]
+            },
+            validate = jsen(schema);
+
+        assert(validate(data));
+    });
+
+    it('Fix validation error with arrays and oneOf no.2 (#55)', function () {
+        var schema = {
+                definitions: {
+                    myObjectDef: {
+                        type: 'number'
+                    }
+                },
+                type: 'array',
+                items: {
+                    oneOf: [
+                        { $ref: '#/definitions/myObjectDef' },
+                        { type: 'string' }
+                    ]
+                }
+            },
+            data = [
+                123,
+                'abc'
+            ],
+            validate = jsen(schema);
+
+        assert(validate(data));
+    });
 });
