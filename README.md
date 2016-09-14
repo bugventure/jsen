@@ -515,6 +515,22 @@ console.log(initial);   // { foo: 1, bar: 2, baz: 3 }
 
 NOTE: When `{ additionalProperties: false, copy: false }` is specified in the `build` options, any additional properties will be deleted from the initial data object.
 
+In some scenarios, you may want to disallow additional properties in the schema, but still keep them when gathering default values with `build()`. This may be required, for example, when you want to explicitly fail validation and display a message to the user, listing any excessive properties that are forbidden by the schema. Setting `{ additionalProperties: 'always' }` will prevent the `build()` function from removing any properties in the initial object.
+
+```javascript
+var schema = {
+        additionalProperties: false,
+        properties: {
+            foo: {}
+        }
+    };
+var initial = { foo: 1, bar: 2 };
+var validate = jsen(schema);
+
+var withDefaults = validate.build(initial, { additionalProperties: 'always' });
+// withDefaults has both 'foo' and 'bar' keys
+```
+
 ## In-Browser Usage
 
 Browser-compatible builds of `jsen` (with the help of [browserify](http://npmjs.com/package/browserify)) can be found in the `dist` folder. These are built with the [standalone](https://github.com/substack/browserify-handbook#standalone) option of browserify, meaning they will work in node, the browser with globals, and AMD loader environments. In the browser, the `window.jsen` global object will refer to the validator builder function.
