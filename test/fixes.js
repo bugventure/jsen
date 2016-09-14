@@ -307,4 +307,15 @@ describe('fixes', function () {
 
         assert(validate(data));
     });
+
+    it('Fix schema validation gives a false positive when the type keyword does not specify a valid type string (#52)', function () {
+        var schema = {
+                properties:{
+                    foo: { type: 'bar' }
+                }
+            },
+            validateSchema = jsen({ $ref: 'http://json-schema.org/draft-04/schema#' });
+
+        assert(!validateSchema(schema));
+    });
 });

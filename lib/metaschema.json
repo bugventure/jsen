@@ -16,10 +16,7 @@
             "allOf": [ { "$ref": "#/definitions/positiveInteger" }, { "default": 0 } ]
         },
         "simpleTypes": {
-            "anyOf": [
-                { "enum": [ "array", "boolean", "integer", "null", "number", "object", "string", "any" ] },
-                { "type": "string" }
-            ]
+            "enum": [ "array", "boolean", "integer", "null", "number", "object", "string" ]
         },
         "stringArray": {
             "type": "array",
