@@ -1,5 +1,15 @@
 ## Changelog
 
+### v0.6.2
+
+* Add support for `build({ additionalProperties: 'always'})` (#60)
+* Add `error.additionalProperties` that specify forbidden property keys (#54)
+* Add support for NetSuite (#63)
+* Fix schema validation gives a false positive when the type keyword does not specify a valid type string (#52)
+* Fix validation error with arrays and oneOf (#55)
+* Fix validation error when using the additionalProperties keyword (#56)
+* Fix requiredMessage doesnt work when referencing external schema files (#51)
+
 ### v0.6.1
 
 * Fix various RegExp escaping issues in node v4.0 and above (#47)
