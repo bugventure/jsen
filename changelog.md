@@ -1,6 +1,6 @@
 ## Changelog
 
-### v0.6.2
+### v0.6.3
 
 * Add support for `build({ additionalProperties: 'always'})` (#60)
 * Add `error.additionalProperties` that specify forbidden property keys (#54)
