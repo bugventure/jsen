@@ -171,6 +171,7 @@ module.exports = function func() {
 var PATH_REPLACE_EXPR = /\[.+?\]/g,
     PATH_PROP_REPLACE_EXPR = /\[?(.*?)?\]/,
     REGEX_ESCAPE_EXPR = /[\/]/g,
+    STR_ESCAPE_EXPR = /(")/gim,
     VALID_IDENTIFIER_EXPR = /^[a-z_$][0-9a-z]*$/gi,
     INVALID_SCHEMA = 'jsen: invalid schema object',
     browser = typeof window === 'object' && !!window.navigator,   // jshint ignore: line
@@ -196,15 +197,23 @@ function inlineRegex(regex) {
     return str;
 }
 
+function encodeStr(str) {
+    return '"' + str.replace(STR_ESCAPE_EXPR, '\\$1') + '"';
+}
+
 function appendToPath(path, key) {
     VALID_IDENTIFIER_EXPR.lastIndex = 0;
 
     return VALID_IDENTIFIER_EXPR.test(key) ?
         path + '.' + key :
-        path + '["' + key + '"]';
+        path + '[' + encodeStr(key) + ']';
 }
 
 function type(obj) {
+    if (obj === undefined) {
+        return 'undefined';
+    }
+
     var str = Object.prototype.toString.call(obj);
     return str.substr(8, str.length - 9).toLowerCase();
 }
@@ -280,7 +289,7 @@ keywords['enum'] = function (context) {
         if (value === null || ['boolean', 'number', 'string'].indexOf(enumType) > -1) {
             // simple equality check for simple data types
             if (enumType === 'string') {
-                clauses.push(context.path + ' === "' + value + '"');
+                clauses.push(context.path + ' === ' + encodeStr(value));
             }
             else {
                 clauses.push(context.path + ' === ' + value);
@@ -422,7 +431,7 @@ keywords.items = function (context) {
         i = 0;
 
     if (type(context.schema.items) === 'object') {
-        context.code('for (' + index + '; ' + index + ' < ' + context.path + '.length; ' + index + '++) {');
+        context.code('for (' + index + ' = 0; ' + index + ' < ' + context.path + '.length; ' + index + '++) {');
 
         context.validate(context.path + '[' + index + ']', context.schema.items, context.noFailFast);
 
@@ -538,7 +547,7 @@ keywords.patternProperties = keywords.additionalProperties = function (context) 
 
     context.code(keys + ' = Object.keys(' + context.path + ')');
 
-    context.code('for (' + n + '; ' + n + ' < ' + keys + '.length; ' + n + '++) {')
+    context.code('for (' + n + ' = 0; ' + n + ' < ' + keys + '.length; ' + n + '++) {')
         (key + ' = ' + keys + '[' + n + ']')
 
         ('if (' + context.path + '[' + key + '] === undefined) {')
@@ -553,7 +562,7 @@ keywords.patternProperties = keywords.additionalProperties = function (context) 
     for (i = 0; i < propKeys.length; i++) {
         propKey = propKeys[i];
 
-        context.code((i ? 'else ' : '') + 'if (' + key + ' === "' + propKey + '") {');
+        context.code((i ? 'else ' : '') + 'if (' + key + ' === ' + encodeStr(propKey) + ') {');
 
         if (addPropsCheck) {
             context.code(found + ' = true');
@@ -585,7 +594,7 @@ keywords.patternProperties = keywords.additionalProperties = function (context) 
 
         if (addProps === false) {
             // do not allow additional properties
-            context.error('additionalProperties');
+            context.error('additionalProperties', undefined, key);
         }
         else {
             // validate additional properties
@@ -682,6 +691,7 @@ keywords.oneOf = function (context) {
         i = 0;
 
     context.code(initialCount + ' = errors.length');
+    context.code(matching + ' = 0');
 
     for (; i < context.schema.oneOf.length; i++) {
         context.code(errCount + ' = errors.length');
@@ -879,16 +889,18 @@ function build(schema, def, additional, resolver, parentMarker) {
             }
         }
 
-        for (key in def) {
-            if (!(key in schema.properties) &&
-                (schema.additionalProperties === false ||
-                (additional === false && !schema.additionalProperties))) {
+        if (additional !== 'always') {
+            for (key in def) {
+                if (!(key in schema.properties) &&
+                    (schema.additionalProperties === false ||
+                    (additional === false && !schema.additionalProperties))) {
 
-                if (parentMarker) {
-                    parentMarker.mark(def, key);
-                }
-                else {
-                    delete def[key];
+                    if (parentMarker) {
+                        parentMarker.mark(def, key);
+                    }
+                    else {
+                        delete def[key];
+                    }
                 }
             }
         }
@@ -984,6 +996,7 @@ function jsen(schema, options) {
 
         function validate(path, schema, noFailFast) {
             var context,
+                encodedFormat,
                 cachedRef,
                 pathExp,
                 index,
@@ -993,57 +1006,36 @@ function jsen(schema, options) {
                 gen,
                 i;
 
-            function error(keyword, key) {
-                var varid,
-                    errorPath = path,
-                    message = (key && schema.properties && schema.properties[key] && schema.properties[key].requiredMessage) ||
-                        schema.invalidMessage;
+            function error(keyword, key, additional) {
+                var errorPath = path,
+                    res = key && schema.properties && schema.properties[key] ?
+                        resolver.resolve(schema.properties[key]) : null,
+                    message = res ? res.requiredMessage : schema.invalidMessage;
 
                 if (!message) {
-                    message = key && schema.properties && schema.properties[key] && schema.properties[key].messages &&
-                        schema.properties[key].messages[keyword] ||
-                        schema.messages && schema.messages[keyword];
+                    message = (res && res.messages && res.messages[keyword]) ||
+                        (schema.messages && schema.messages[keyword]);
                 }
 
-                if (path.indexOf('[') > -1) {
-                    // create error objects dynamically when path contains indexed property expressions
-                    errorPath = getPathExpression(path);
+                errorPath = path.indexOf('[') > -1 ? getPathExpression(path) : encodeStr(errorPath.substr(5));
 
-                    if (key) {
-                        errorPath = errorPath ? errorPath + ' + ".' + key + '"' : key;
-                    }
-
-                    code('errors.push({')
-                        ('path: ' +  errorPath + ', ')
-                        ('keyword: "' + keyword + '"' + (message ? ',' : ''));
-
-                    if (message) {
-                        code('message: "' + message + '"');
-                    }
-
-                    code('})');
+                if (key) {
+                    errorPath = errorPath !== '""' ? errorPath + ' + ".' + key + '"' : encodeStr(key);
                 }
-                else {
-                    // generate faster code when no indexed properties in the path
-                    varid = id();
 
-                    errorPath = errorPath.substr(5);
+                code('errors.push({');
 
-                    if (key) {
-                        errorPath = errorPath ? errorPath + '.' + key : key;
-                    }
-
-                    refs[varid] = {
-                        path: errorPath,
-                        keyword: keyword
-                    };
-
-                    if (message) {
-                        refs[varid].message = message;
-                    }
-
-                    code('errors.push(refs.' + varid + ')');
+                if (message) {
+                    code('message: ' + encodeStr(message) + ',');
                 }
+
+                if (additional) {
+                    code('additionalProperties: ' + additional + ',');
+                }
+
+                code('path: ' +  errorPath + ', ')
+                    ('keyword: ' + encodeStr(keyword))
+                ('})');
 
                 if (!noFailFast && !options.greedy) {
                     code('return (validate.errors = errors) && false');
@@ -1117,7 +1109,9 @@ function jsen(schema, options) {
                         (scope.formats || (scope.formats = {}))[schema.format] = format;
                         (scope.schemas || (scope.schemas = {}))[schema.format] = schema;
 
-                        code('if (!formats["' + schema.format + '"](' + context.path + ', schemas["' + schema.format + '"])) {');
+                        encodedFormat = encodeStr(schema.format);
+
+                        code('if (!formats[' + encodedFormat + '](' + context.path + ', schemas[' + encodedFormat + '])) {');
                         error('format');
                         code('}');
                     }
@@ -1178,10 +1172,7 @@ module.exports={
             "allOf": [ { "$ref": "#/definitions/positiveInteger" }, { "default": 0 } ]
         },
         "simpleTypes": {
-            "anyOf": [
-                { "enum": [ "array", "boolean", "integer", "null", "number", "object", "string", "any" ] },
-                { "type": "string" }
-            ]
+            "enum": [ "array", "boolean", "integer", "null", "number", "object", "string" ]
         },
         "stringArray": {
             "type": "array",
@@ -1313,7 +1304,6 @@ module.exports={
     },
     "default": {}
 }
-
 },{}],7:[function(require,module,exports){
 'use strict';
 
