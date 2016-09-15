@@ -24,4 +24,20 @@ describe('jsen', function () {
         assert(validate() === true);
         // assert(validate.error === null);
     });
+
+    it('does not throw if nested schemas are invalid', function () {
+        var schemas = [
+            { properties: { foo: null } },
+            { properties: { foo: 123 } },
+            { items: { properties: { foo: undefined } } },
+            { allOf: [{ properties: { foo: undefined }}] },
+            { allOf: [{ properties: { foo: [] }}] }
+        ];
+
+        schemas.forEach(function (schema) {
+            assert.doesNotThrow(function () {
+                assert(jsen(schema)());
+            });
+        });
+    });
 });
