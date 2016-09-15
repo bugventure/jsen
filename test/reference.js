@@ -100,6 +100,28 @@ describe('JSON Pointer', function () {
     });
 });
 
+describe('SchemaResolver', function () {
+    var SchemaResolver = require('../lib/resolver.js');
+
+    it('resolve() returns non-object schema arguments', function () {
+        var resolver = new SchemaResolver({}),
+            arr = [];
+
+        assert.strictEqual(resolver.resolve(), undefined);
+        assert.strictEqual(resolver.resolve(null), null);
+        assert.strictEqual(resolver.resolve(123), 123);
+        assert.strictEqual(resolver.resolve(''), '');
+        assert.strictEqual(resolver.resolve(arr), arr);
+    });
+
+    it('resolve() returns original object if no $ref', function () {
+        var resolver = new SchemaResolver({}),
+            obj = {};
+
+        assert.strictEqual(resolver.resolve(obj), obj);
+    });
+});
+
 describe('$ref', function () {
     it('throws if string is not in correct format', function () {
         assert.throws(function () {
