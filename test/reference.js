@@ -63,7 +63,7 @@ describe('JSON Pointer', function () {
         assert(!validate({ foo: '123' }));
     });
 
-    it('resolver does not parse $refs that do not start with `#` as JSON pointer', function () {
+    it('resolver parses $refs that do not start with `#`', function () {
         var schema = {
                 id: 'http://jsen.bis/schemaA',
                 definitions: {
@@ -89,8 +89,8 @@ describe('JSON Pointer', function () {
         assert(validate({ foo: 'abc' }));
         assert(!validate({ foo: 123 }));
 
-        assert(validate({ foo2: null }));
-        assert(!validate({ foo2: {} }));
+        assert(validate({ foo2: {} }));
+        assert(!validate({ foo2: null }));
 
         assert(validate({ bar: 123 }));
         assert(!validate({ bar: '123' }));

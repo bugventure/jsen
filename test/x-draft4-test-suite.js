@@ -11,13 +11,17 @@ var dir = '../node_modules/json-schema-test-suite/tests/draft4',
     testCategories = [],
     error,
     excludedFiles = [
-        'refRemote',
         'zeroTerminatedFloats'
     ],
     excludedCases = [
         'two supplementary Unicode code points is long enough',
         'one supplementary Unicode code point is not long enough'
     ],
+    refs = {
+        'http://localhost:1234/integer.json': require('../node_modules/json-schema-test-suite/remotes/integer.json'),
+        'http://localhost:1234/subSchemas.json': require('../node_modules/json-schema-test-suite/remotes/subSchemas.json'),
+        'http://localhost:1234/folder/folderInteger.json': require('../node_modules/json-schema-test-suite/remotes/folder/folderInteger.json')
+    },
     walk;
 
 if (jsen.browser) {
@@ -108,10 +112,12 @@ function addTestCase(schema, testCase) {
         return;
     }
 
-    it(testCase.description, function () {
+    var tit = testCase.only ? it.only : it;
+
+    tit(testCase.description, function () {
         var prejson = JSON.stringify(schema);
 
-        assert.strictEqual(jsen(schema)(testCase.data), testCase.valid);
+        assert.strictEqual(jsen(schema, { schemas: refs })(testCase.data), testCase.valid);
 
         assert.strictEqual(JSON.stringify(schema), prejson,
             'validator does not modify original JSON');
