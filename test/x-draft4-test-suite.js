@@ -112,9 +112,9 @@ function addTestCase(schema, testCase) {
         return;
     }
 
-    var tit = testCase.only ? it.only : it;
+    var test = testCase.only ? it.only : it;
 
-    tit(testCase.description, function () {
+    test(testCase.description, function () {
         var prejson = JSON.stringify(schema);
 
         assert.strictEqual(jsen(schema, { schemas: refs })(testCase.data), testCase.valid);

@@ -244,4 +244,49 @@ describe('$ref', function () {
             assert(!validate(123));
         });
     });
+
+    describe('scope resolution', function () {
+        it.only('changes scope through id', function () {
+            var schema = {
+                    id: 'http://x.y.z/rootschema.json#',
+                    type: 'number',
+                    schema1: {
+                        id: '#foo'
+                    },
+                    schema2: {
+                        id: 'otherschema.json',
+                        nested: {
+                            id: '#bar'
+                        },
+                        alsonested: {
+                            id: 't/inner.json#a'
+                        }
+                    },
+                    schema3: {
+                        id: 'some://where.else/completely#'
+                    }
+                },
+                expected = {
+                    'http://x.y.z/rootschema.json#': 123,
+                    // 'http://x.y.z/rootschema.json#foo': null,
+                    // 'http://x.y.z/otherschema.json#': null,
+                    // 'http://x.y.z/otherschema.json#bar': null,
+                    // 'http://x.y.z/t/inner.json#a': null,
+                    // 'some://where.else/completely#': null
+                };
+
+            Object.keys(expected).forEach(function (key) {
+                var schemaCopy = JSON.parse(JSON.stringify(schema)),
+                    validate;
+
+                schemaCopy.$ref = key;
+
+                // assert.doesNotThrow(function () {
+                    validate = jsen(schemaCopy);
+                // });
+
+                assert(validate(expected[key]));
+            });
+        });
+    });
 });
