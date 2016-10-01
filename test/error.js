@@ -408,30 +408,27 @@ describe('errors', function () {
     });
 
     describe('multiple errors', function () {
-        var schema = {
-                definitions: {
-                    array: {
-                        maxItems: 1
+        it('returns multiple errors', function () {
+            var schema = {
+                    definitions: {
+                        array: {
+                            maxItems: 1
+                        }
+                    },
+                    type: 'object',
+                    properties: {
+                        a: {
+                            anyOf: [
+                                { items: { type: 'integer' } },
+                                { $ref: '#/definitions/array' },
+                                { items: [{ maximum: 3 }] }
+                            ]
+                        }
                     }
                 },
-                type: 'object',
-                properties: {
-                    a: {
-                        anyOf: [
-                            { items: { type: 'integer' } },
-                            { $ref: '#/definitions/array' },
-                            { items: [{ maximum: 3 }] }
-                        ]
-                    }
-                }
-            },
-            data = { a: [Math.PI, Math.E] },
-            validate = jsen(schema);
-
-        it('returns multiple errors', function () {
-            var valid = validate(data);
-
-            // console.log(validate.errors);
+                data = { a: [Math.PI, Math.E] },
+                validate = jsen(schema),
+                valid = validate(data);
 
             assert(!valid);
             assert.strictEqual(validate.errors.length, 5);

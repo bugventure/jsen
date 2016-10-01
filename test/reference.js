@@ -76,12 +76,14 @@ describe('JSON Pointer', function () {
                 },
                 bar: { type: 'number' },
                 '/definitions/baz': { type: 'boolean' },
+                'definitions/bar': { type: 'boolean' },
                 'http://jsen.bis/schemaA#/definitions/foo2': { type: 'null' },
                 properties: {
                     foo: { $ref: 'http://jsen.bis/schemaA#bar' },
                     foo2: { $ref: 'http://jsen.bis/schemaA#/definitions/foo2' },
                     bar: { $ref: '#/bar' },
-                    baz: { $ref: '/definitions/baz' }
+                    baz: { $ref: '#/definitions/baz' },
+                    ttt: { $ref: '#/definitions~1bar' }
                 }
             },
             validate = jsen(schema);
@@ -95,8 +97,11 @@ describe('JSON Pointer', function () {
         assert(validate({ bar: 123 }));
         assert(!validate({ bar: '123' }));
 
-        assert(validate({ baz: false }));
-        assert(!validate({ baz: [] }));
+        assert(validate({ baz: [] }));
+        assert(!validate({ baz: false }));
+
+        assert(validate({ ttt: false }));
+        assert(!validate({ baz: {} }));
     });
 });
 
@@ -226,13 +231,15 @@ describe('$ref', function () {
         });
 
         it('external schemas have their own dereferencing scope', function () {
-            var external = {
-                    inner: { type: 'string' },
-                    $ref: '#inner'
-                },
-                schema = {
+            var schema = {
                     inner: { type: 'number' },
                     $ref: '#external'
+                },
+                external = {
+                    inner: { type: 'string' },
+                    properties: {
+                        foo: { $ref: '#inner' }
+                    }
                 },
                 validate = jsen(schema, {
                     schemas: {
@@ -240,8 +247,31 @@ describe('$ref', function () {
                     }
                 });
 
-            assert(validate('abc'));
-            assert(!validate(123));
+            assert(validate({ foo: 'abc' }));
+            assert(!validate({ foo: 123 }));
+        });
+
+        it('external schema keys are used as id in scope dereferencing', function () {
+            var schema = {
+                    id: 'http://example.com/parent',
+                    definitions: {
+                        foo: { type: 'string' }
+                    },
+                    $ref: 'child#/definitions/foo'
+                },
+                external = {
+                    definitions: {
+                        foo: { type: 'number' }
+                    }
+                },
+                validate = jsen(schema, {
+                    schemas: {
+                        child: external
+                    }
+                });
+
+            assert(validate(123));
+            assert(!validate('abc'));
         });
     });
 
@@ -249,7 +279,7 @@ describe('$ref', function () {
         it('changes scope through id', function () {
             var schema = {
                     id: 'http://x.y.z/rootschema.json#',
-                    type: 'number',
+                    items: { $ref: '' },
                     schema1: {
                         id: '#foo',
                         type: 'string'
@@ -294,14 +324,14 @@ describe('$ref', function () {
                 var schemaCopy = JSON.parse(JSON.stringify(schema)),
                     validate;
 
-                schemaCopy.$ref = key;
+                schemaCopy.items.$ref = key;
 
                 assert.doesNotThrow(function () {
                     validate = jsen(schemaCopy);
                 });
 
-                assert(validate(expectedValid[key]));
-                assert(!validate(expectedInvalid[key]));
+                assert(validate([expectedValid[key]]));
+                assert(!validate([expectedInvalid[key]]));
             });
         });
     });
@@ -318,6 +348,17 @@ describe('$ref', function () {
 
             assert.throws(function () {
                 jsen({
+                    id: 'http://x.y.z/rootschema.json#/definitions/foo',
+                    definitions: { foo: { type: 'string' } },
+                    $ref: 'http://x.y.z/rootschema.json#/definitions/foo',
+                    type: 'number'
+                });
+            });
+        });
+
+        it('does not throw on self-referencing schema followed by a pointer', function () {
+            assert.doesNotThrow(function () {
+                var validate = jsen({
                     id: 'http://x.y.z/rootschema.json#',
                     definitions: {
                         number: {
@@ -326,6 +367,9 @@ describe('$ref', function () {
                     },
                     $ref: 'http://x.y.z/rootschema.json#/definitions/number'
                 });
+
+                assert(validate(123));
+                assert(!validate(''));
             });
 
             assert.doesNotThrow(function () {
