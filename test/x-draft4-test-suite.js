@@ -59,17 +59,19 @@ if (jsen.browser) {
             ],
             xhr, spec;
 
+        function onXhrLoad() {
+            testCategories.push({
+                name: spec,
+                testGroups: JSON.parse(this.responseText)   // jshint ignore: line
+            });
+        }
+
         while (specs.length) {
             spec = specs.shift();
 
             xhr = new XMLHttpRequest();     // jshint ignore: line
 
-            xhr.onload = function () {
-                testCategories.push({
-                    name: spec,
-                    testGroups: JSON.parse(this.responseText)
-                });
-            };                              // jshint ignore: line
+            xhr.onload = onXhrLoad;
 
             xhr.open('GET', dir + spec + '.json', false);
 
@@ -108,7 +110,7 @@ catch (e) {
 }
 
 function addTestCase(schema, testCase) {
-    if (excludedCases.indexOf(testCase.description) > -1) {
+    if (excludedCases.indexOf(testCase.description) > -1 || testCase.skip) {
         return;
     }
 
