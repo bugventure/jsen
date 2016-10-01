@@ -246,47 +246,130 @@ describe('$ref', function () {
     });
 
     describe('scope resolution', function () {
-        it.only('changes scope through id', function () {
+        it('changes scope through id', function () {
             var schema = {
                     id: 'http://x.y.z/rootschema.json#',
                     type: 'number',
                     schema1: {
-                        id: '#foo'
+                        id: '#foo',
+                        type: 'string'
                     },
                     schema2: {
                         id: 'otherschema.json',
                         nested: {
-                            id: '#bar'
+                            id: '#bar',
+                            type: 'boolean'
                         },
                         alsonested: {
-                            id: 't/inner.json#a'
-                        }
+                            id: 't/inner.json#a',
+                            type: 'array'
+                        },
+                        enum: [1, 2, 3]
                     },
                     schema3: {
-                        id: 'some://where.else/completely#'
+                        id: 'some://where.else/completely#',
+                        type: 'object'
                     }
                 },
-                expected = {
-                    'http://x.y.z/rootschema.json#': 123,
-                    // 'http://x.y.z/rootschema.json#foo': null,
-                    // 'http://x.y.z/otherschema.json#': null,
-                    // 'http://x.y.z/otherschema.json#bar': null,
-                    // 'http://x.y.z/t/inner.json#a': null,
-                    // 'some://where.else/completely#': null
+                expectedValid = {
+                    '#schema2': 1,
+                    '#/schema2': 1,
+                    'http://x.y.z/rootschema.json#foo': 'abc',
+                    'http://x.y.z/otherschema.json#': 2,
+                    'http://x.y.z/otherschema.json#bar': false,
+                    'http://x.y.z/t/inner.json#a': [],
+                    'some://where.else/completely#': {}
+                },
+                expectedInvalid = {
+                    '#/schema2': 4,
+                    '#schema2': 4,
+                    'http://x.y.z/rootschema.json#foo': 123,
+                    'http://x.y.z/otherschema.json#': 0,
+                    'http://x.y.z/otherschema.json#bar': null,
+                    'http://x.y.z/t/inner.json#a': true,
+                    'some://where.else/completely#': null
                 };
 
-            Object.keys(expected).forEach(function (key) {
+            Object.keys(expectedValid).forEach(function (key) {
                 var schemaCopy = JSON.parse(JSON.stringify(schema)),
                     validate;
 
                 schemaCopy.$ref = key;
 
-                // assert.doesNotThrow(function () {
+                assert.doesNotThrow(function () {
                     validate = jsen(schemaCopy);
-                // });
+                });
 
-                assert(validate(expected[key]));
+                assert(validate(expectedValid[key]));
+                assert(!validate(expectedInvalid[key]));
             });
+        });
+    });
+
+    describe('recursive resolution', function () {
+        it('throws on self-referencing schema', function () {
+            assert.throws(function () {
+                jsen({
+                    id: 'http://x.y.z/rootschema.json#',
+                    $ref: 'http://x.y.z/rootschema.json#',
+                    type: 'number'
+                });
+            });
+
+            assert.throws(function () {
+                jsen({
+                    id: 'http://x.y.z/rootschema.json#',
+                    definitions: {
+                        number: {
+                            type: 'number'
+                        }
+                    },
+                    $ref: 'http://x.y.z/rootschema.json#/definitions/number'
+                });
+            });
+
+            assert.doesNotThrow(function () {
+                var validate = jsen({
+                    id: 'http://x.y.z/rootschema.json#',
+                    definitions: {
+                        number: {
+                            type: 'number'
+                        }
+                    },
+                    $ref: '#/definitions/number'
+                });
+
+                assert(validate(123));
+                assert(!validate(''));
+            });
+        });
+
+        it('throws on circular reference', function () {
+            var schema = {
+                definitions: {
+                    a: { $ref: '#/definitions/b'},
+                    b: { $ref: '#/definitions/c' },
+                    c: { $ref: '#/definitions/a' }
+                },
+                $ref: '#/definitions/a'
+            };
+
+            jsen(schema);
+        });
+
+        it('does not throw on non-circular reference', function () {
+            var schema = {
+                    definitions: {
+                        a: { type: 'integer' },
+                        b: { $ref: '#/definitions/a' },
+                        c: { $ref: '#/definitions/b' }
+                    },
+                    $ref: '#/definitions/c'
+                },
+                validate = jsen(schema);
+
+            assert(validate(123));
+            assert(!validate(Math.PI));
         });
     });
 });
