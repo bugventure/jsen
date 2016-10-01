@@ -1,5 +1,9 @@
 ## Changelog
 
+### v0.6.4
+* Add support for scope dereferencing with the `id` keyword (#70)
+* Add support for remote schema references specified in the `schemas` option (#69)
+
 ### v0.6.3
 
 * Add support for `build({ additionalProperties: 'always'})` (#60)
@@ -54,7 +58,7 @@
 ### v0.2.0
 
 * Add support for custom format validators (#8, #9)
-* Add support for validating javascipt Date objects (#17) 
+* Add support for validating javascipt Date objects (#17)
 
 ### v0.1.2
 
@@ -68,7 +72,7 @@
 ### v0.1.0
 
 * Custom error messages defined in the schema
-* Append the required property name to the path in the error object for `required` and `dependencies` keywords (#7) 
+* Append the required property name to the path in the error object for `required` and `dependencies` keywords (#7)
 * Fix protocol-relative URIs are marked invalid (#13)
 * Update [JSON-Schema-Test-Suite](https://github.com/json-schema/JSON-Schema-Test-Suite) tests (#12)
 

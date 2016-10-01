@@ -1,4 +1,4 @@
-JSEN 
+JSEN
 =================
 
 [![Build][travis-img]][travis-url] [![Coverage][coveralls-img]][coveralls-url] [![Downloads][downloads-img]][npm-url]
@@ -17,6 +17,7 @@ jsen (JSON Sentinel) validates your JSON objects using [JSON-Schema](http://json
 - [Format Validation](#format-validation)
     - [Custom Formats](#custom-formats)
 - [External Schemas](#external-schemas)
+    - [Remote Schemas](#remote-schemas)
 - [Errors](#errors)
     - [Custom Errors](#custom-errors)
     - [Custom Errors for Keywords](#custom-errors-for-keywords)
@@ -92,9 +93,9 @@ If you need to validate your schema object, you can use a reference to the [JSON
 var validateSchema = jsen({"$ref": "http://json-schema.org/draft-04/schema#"});
 var isSchemaValid = validateSchema({ type: 'object' }); // true
 
-isSchemaValid = validateSchema({ 
-    type: 'object', 
-    properties: ['string', 'number'] 
+isSchemaValid = validateSchema({
+    type: 'object',
+    properties: ['string', 'number']
 });
 // false, because properties is not in correct format
 ```
@@ -117,7 +118,7 @@ To get started with JSON Schema, check out the [JSEN schema guide](schema.md).
 
 For further reading, check out this [excellent guide to JSON Schema](http://spacetelescope.github.io/understanding-json-schema/UnderstandingJSONSchema.pdf) by Michael Droettboom, et al.
 
-JSEN fully implements draft 4 of the [JSON Schema specification](http://json-schema.org/documentation.html). 
+JSEN fully implements draft 4 of the [JSON Schema specification](http://json-schema.org/documentation.html).
 
 ## Format Validation
 
@@ -127,7 +128,7 @@ JSEN supports a few built-in formats, as defined by the [JSON Schema spec](http:
 * `uri`
 * `email`
 * `ipv4`
-* `ipv6` 
+* `ipv6`
 * `hostname`
 
 These formats are validated against string values only. As per the spec, format validation passes successfully for any non-string value.
@@ -142,7 +143,7 @@ validate({});               // true - does not kick in for non-strings
 
 ### Custom Formats
 
-JSEN additionally supports custom format validation. Custom formats are passed in `options.formats` as a second argument to the `jsen` validator builder function. 
+JSEN additionally supports custom format validation. Custom formats are passed in `options.formats` as a second argument to the `jsen` validator builder function.
 
 ```javascript
 var schema = { format: 'uuid' },
@@ -195,6 +196,20 @@ validate = jsen(schema);    // Error: jsen: invalid schema reference #missing
 validate = jsen(schema, {   // OK, will ignore missing references
     missing$Ref: true
 })
+```
+
+### Remote Schemas
+
+Although JSEN does not automatically fetch remote schemas by making HTTP requests, you can fetch and provide them through the `schemas` option by giving their URIs as object keys.
+
+```javascript
+var schema = { $ref: 'http://localhost:1234/integer.json' },
+    externalSchema = { type: 'integer' }, // Downloaded from http://localhost:1234/integer.json
+    validate = jsen(schema, {
+        schemas: {
+            'http://localhost:1234/integer.json': externalSchema
+        }
+    });
 ```
 
 ## Errors
@@ -562,7 +577,6 @@ serving "." at http://127.0.0.1:8080
 
 `jsen` passes all draft 4 test cases specified by the [JSON-Schema-Test-Suite](https://github.com/json-schema/JSON-Schema-Test-Suite) with the exception of:
 
-* Remote refs
 * Zero-terminated floats
 * Max/min length when using Unicode surrogate pairs
 
@@ -601,7 +615,7 @@ Read [changelog.md](changelog.md)
 
 ## License
 
-MIT 
+MIT
 
 [travis-url]: https://travis-ci.org/bugventure/jsen
 [travis-img]: https://travis-ci.org/bugventure/jsen.svg?branch=master
