@@ -2,7 +2,8 @@
 'use strict';
 
 var assert = assert || require('assert'),
-    jsen = jsen || require('../index.js');
+    jsen = jsen || require('../index.js'),
+    SchemaResolver = jsen.SchemaResolver;
 
 // Reference: https://tools.ietf.org/html/rfc6901
 describe('JSON Pointer', function () {
@@ -106,8 +107,6 @@ describe('JSON Pointer', function () {
 });
 
 describe('SchemaResolver', function () {
-    var SchemaResolver = require('../lib/resolver.js');
-
     it('resolve() returns non-object schema arguments', function () {
         var resolver = new SchemaResolver({}),
             arr = [];

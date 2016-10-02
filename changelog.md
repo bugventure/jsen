@@ -4,6 +4,7 @@
 * `minLength` and `maxLength` keywords now properly calculate character length of Unicode surrogate pairs (#58)
 * Add support for scope dereferencing with the `id` keyword (#70)
 * Add support for remote schema references specified in the `schemas` option (#69)
+* Enable full unit test support in the browser and add testling badge (#71)
 
 ### v0.6.3
 

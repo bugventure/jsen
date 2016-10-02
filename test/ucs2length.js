@@ -2,7 +2,8 @@
 'use strict';
 
 var assert = assert || require('assert'),
-    ucs2length = require('../lib/ucs2length.js');
+    jsen = jsen || require('../index.js'),
+    ucs2length = jsen.ucs2length;
 
 // Reference: https://github.com/bestiejs/punycode.js/blob/master/tests/tests.js
 describe('ucs2length', function () {

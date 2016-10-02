@@ -14,9 +14,17 @@ var dir = '../node_modules/json-schema-test-suite/tests/draft4',
         'zeroTerminatedFloats'
     ],
     refs = {
-        'http://localhost:1234/integer.json': require('../node_modules/json-schema-test-suite/remotes/integer.json'),
-        'http://localhost:1234/subSchemas.json': require('../node_modules/json-schema-test-suite/remotes/subSchemas.json'),
-        'http://localhost:1234/folder/folderInteger.json': require('../node_modules/json-schema-test-suite/remotes/folder/folderInteger.json')
+        'http://localhost:1234/integer.json': '../node_modules/json-schema-test-suite/remotes/integer.json',
+        'http://localhost:1234/subSchemas.json': '../node_modules/json-schema-test-suite/remotes/subSchemas.json',
+        'http://localhost:1234/folder/folderInteger.json': '../node_modules/json-schema-test-suite/remotes/folder/folderInteger.json'
+    },
+    httpGet = function (url, onload) {
+        var xhr = new XMLHttpRequest();     // jshint ignore: line
+        xhr.onload = function () {
+            onload(JSON.parse(this.responseText));
+        };
+        xhr.open('GET', url, false);
+        xhr.send(null);
     },
     walk;
 
@@ -49,32 +57,32 @@ if (jsen.browser) {
                 'patternProperties',
                 'properties',
                 'ref',
+                'refRemote',
                 'required',
                 'type',
                 'uniqueItems'
             ],
-            xhr, spec;
+            spec;
 
-        function onXhrLoad() {
+        function onXhrLoad(data) {
             testCategories.push({
                 name: spec,
-                testGroups: JSON.parse(this.responseText)   // jshint ignore: line
+                testGroups: data    // jshint ignore: line
             });
         }
 
         while (specs.length) {
             spec = specs.shift();
-
-            xhr = new XMLHttpRequest();     // jshint ignore: line
-
-            xhr.onload = onXhrLoad;
-
-            xhr.open('GET', dir + spec + '.json', false);
-
-            xhr.send(null);
+            httpGet(dir + spec + '.json', onXhrLoad);
         }
 
     };
+
+    Object.keys(refs).forEach(function (key) {
+        httpGet(refs[key], function (data) {
+            refs[key] = data;
+        });
+    });
 }
 else {
     walk = function (dir) {
@@ -96,6 +104,10 @@ else {
             }
         });
     };
+
+    Object.keys(refs).forEach(function (key) {
+        refs[key] = require(refs[key]);
+    });
 }
 
 try {
