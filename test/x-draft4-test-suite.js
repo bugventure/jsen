@@ -13,10 +13,6 @@ var dir = '../node_modules/json-schema-test-suite/tests/draft4',
     excludedFiles = [
         'zeroTerminatedFloats'
     ],
-    excludedCases = [
-        'two supplementary Unicode code points is long enough',
-        'one supplementary Unicode code point is not long enough'
-    ],
     refs = {
         'http://localhost:1234/integer.json': require('../node_modules/json-schema-test-suite/remotes/integer.json'),
         'http://localhost:1234/subSchemas.json': require('../node_modules/json-schema-test-suite/remotes/subSchemas.json'),
@@ -110,7 +106,7 @@ catch (e) {
 }
 
 function addTestCase(schema, testCase) {
-    if (excludedCases.indexOf(testCase.description) > -1 || testCase.skip) {
+    if (testCase.skip) {
         return;
     }
 
