@@ -5,6 +5,8 @@ JSEN
 
 [![NPM][npm-img]][npm-url]
 
+[![testling][testling-img]][testling-url]
+
 jsen (JSON Sentinel) validates your JSON objects using [JSON-Schema](http://json-schema.org/documentation.html).
 
 ### Table of Contents
@@ -623,3 +625,5 @@ MIT
 [coveralls-url]: https://coveralls.io/r/bugventure/jsen
 [istanbul]: https://www.npmjs.org/package/istanbul
 [mocha]: http://mochajs.org/
+[testling-img]: https://ci.testling.com/bugventure/jsen.png
+[testling-url]: https://ci.testling.com/bugventure/jsen
