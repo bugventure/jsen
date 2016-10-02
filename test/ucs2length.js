@@ -2,10 +2,10 @@
 'use strict';
 
 var assert = assert || require('assert'),
-    ucs2decode = require('../lib/ucs2decode.js');
+    ucs2length = require('../lib/ucs2length.js');
 
 // Reference: https://github.com/bestiejs/punycode.js/blob/master/tests/tests.js
-describe('ucs2decode', function () {
+describe('ucs2length', function () {
     var ucs2Data = [
         {
             description: 'Consecutive astral symbols',
@@ -44,15 +44,9 @@ describe('ucs2decode', function () {
         }
     ];
 
-    it('decodes Unicode surrogate pairs', function () {
-        ucs2Data.forEach(function (obj) {
-            assert.deepEqual(ucs2decode(obj.encoded), obj.decoded, obj.description);
-        });
-    });
-
     it('calculates character length of Unicode surrogate pairs', function () {
         ucs2Data.forEach(function (obj) {
-            assert.strictEqual(ucs2decode.len(obj.encoded), obj.decoded.length, obj.description);
+            assert.strictEqual(ucs2length(obj.encoded), obj.decoded.length, obj.description);
         });
     });
 });
