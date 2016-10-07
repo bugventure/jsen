@@ -318,4 +318,17 @@ describe('fixes', function () {
 
         assert(!validateSchema(schema));
     });
+
+    it('Fix path values in error objects have unnecessary quotes and brackets (#72)', function () {
+        var schema = {
+                properties: {
+                    first_name: { type: 'string' }
+                }
+            },
+            data = { first_name: null },
+            validate = jsen(schema);
+
+        assert(!validate(data));
+        assert.strictEqual(validate.errors[0].path, 'first_name');
+    });
 });
