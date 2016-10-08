@@ -1,6 +1,6 @@
 {
   "name": "jsen",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "JSON-Schema validator built for speed",
   "author": "Veli Pehlivanov <bugventure@gmail.com>",
   "homepage": "https://github.com/bugventure/jsen",
@@ -23,12 +23,12 @@
     "coverage": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls && rm -rf ./coverage"
   },
   "devDependencies": {
-    "browserify": "10.x",
-    "coveralls": "2.x",
-    "istanbul": "0.x",
     "json-schema-test-suite": "0.0.10",
-    "mocha": "1.x",
-    "uglify": "0.x"
+    "browserify": "latest",
+    "coveralls": "latest",
+    "istanbul": "latest",
+    "mocha": "latest",
+    "uglify": "latest"
   },
   "testling": {
     "harness": "mocha-bdd",

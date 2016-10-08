@@ -555,8 +555,8 @@ Browser-compatible builds of `jsen` (with the help of [browserify](http://npmjs.
 Load from CDN, courtesy of [rawgit](https://rawgit.com/):
 
 ```
-//cdn.rawgit.com/bugventure/jsen/v0.6.3/dist/jsen.js
-//cdn.rawgit.com/bugventure/jsen/v0.6.3/dist/jsen.min.js
+//cdn.rawgit.com/bugventure/jsen/v0.6.4/dist/jsen.js
+//cdn.rawgit.com/bugventure/jsen/v0.6.4/dist/jsen.min.js
 ```
 
 ## Tests
