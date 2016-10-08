@@ -5,6 +5,8 @@
 * Add support for scope dereferencing with the `id` keyword (#70)
 * Add support for remote schema references specified in the `schemas` option (#69)
 * Enable full unit test support in the browser and add testling badge (#71)
+* Improve performance - code generation and compiled validator execution (#73)
+* Fix broken path values in error objects for some property names (#72)
 
 ### v0.6.3
 
