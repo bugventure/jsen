@@ -54,6 +54,7 @@ describe('type: integer', function () {
 
         assert(validate(7));
         assert(validate(999));
+        assert(!validate(7.7));
     });
 
     it('exclusiveMinimum', function () {
@@ -80,6 +81,7 @@ describe('type: integer', function () {
         assert(validate(-12));
         assert(validate(76));
         assert(validate(77));
+        assert(!validate(76.77));
     });
 
     it('exclusiveMaximum', function () {
