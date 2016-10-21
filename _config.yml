@@ -1,0 +1,15 @@
+title: JSEN
+sitename: JSEN (JSON Sentinel) validates your JSON objects using JSON Schema
+keywords: JSON, schema, validator, node, browser, speed, dynamic, code, generation
+description: >
+  JSEN (JSON Sentinel) validates JSON objects using JSON Schema. Uses dynamic
+  code generation to produce high-performance functions that V8 and other
+  JavaScript engines can optimize for perfomance.
+safe: true
+repo_url: https://github.com/bugventure/jsen
+defaults:
+  -
+    scope:
+      path: ""
+    values:
+      layout: "default"
