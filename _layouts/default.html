@@ -9,13 +9,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="keywords" content="{{ site.keywords }}">
-    <meta name="description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
+    <meta name="description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description | strip_html }}{% endif %}">
     <meta name="author" content="bugventure">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
 
     <meta property="og:url" content="{{ site.url }}{{ page.url }}">
     <meta property="og:title" content="{% if page.title %} {{ page.title }} | {% endif %}{{ site.title }}">
-    <meta property="og:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
+    <meta property="og:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description | strip_html }}{% endif %}">
     <meta property="og:image" content="{{ site.url }}/assets/images/jsens.png">
     <meta property="og:type" content="website">
 
@@ -35,51 +35,73 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 </head>
-
-<body class="landing-page">
+{% assign sorted = site.docs | sort:"index" %}
+<body class="body-green">
     <div class="page-wrapper">
         <!-- ******Header****** -->
-        <header class="header text-center">
-            <div class="container">
-                <div class="row">
-                    <div class="col-sm-push-2 col-sm-4 text-right">
-                        <div class="branding">
+        <header id="header" class="header navbar-fixed-top">
+            <nav class="navbar navbar-default">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-nav" aria-expanded="false">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <div class="branding navbar-brand">
                             <h1 class="logo">
-                                <a href="{{ site.url }}"><img src="{{ site.url }}/assets/images/jsen.png" alt="jsen"/></a>
+                                <a href="{{ site.url }}/"><img src="{{ site.url }}/assets/images/jsen.png" alt="jsen"/></a>
                             </h1>
-                        </div><!--//branding-->
-                        <div class="tagline">
-                            <p>JSON-Schema validator<br>built for speed</p>
-                        </div><!--//tagline-->
-                        <div class="badges">
-                            <a href="https://travis-ci.org/bugventure/jsen"><img src="https://travis-ci.org/bugventure/jsen.svg?branch=master" alt="Build"></a>
-                            <a href="https://coveralls.io/r/bugventure/jsen"><img src="https://img.shields.io/coveralls/bugventure/jsen.svg" alt="Coverage"></a>
-                            <a href="https://www.npmjs.org/package/jsen"><img src="http://img.shields.io/npm/dm/jsen.svg" alt="Downloads"></a>
                         </div>
                     </div>
-                    <div class="col-sm-push-2 col-sm-6 text-left">
-                        <div class="code-block">
-                            <pre class="language-javascript"><code class="language-javascript">var validate = jsen({
-  type: 'object',
-  properties: {
-    username: {
-      type: 'string',
-      minLength: 4
-    }
-  }
-});
+                    <div class="collapse navbar-collapse" id="main-nav">
+                        <ul class="nav navbar-nav">
+                            <li><a href="{{ site.url }}/">Home</a></li>
+                            {% for doc in sorted %}
+                                <li{% if page.url == doc.url %} class="active"{% endif %}>
+                                    <a href="{{ site.url }}{{ doc.url }}">{{ doc.title }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="pull-right hidden-xs ext-icons">
+                        <a href="https://www.npmjs.com/package/jsen"><svg viewBox="0 0 18 7" width="42">
+                                <path fill="#CB3837" d="M0,0v6h5v1h4v-1h9v-6"></path>
+                                <path fill="#FFF" d="M1,1v4h2v-3h1v3h1v-4h1v5h2v-4h1v2h-1v1h2v-4h1v4h2v-3h1v3h1v-3h1v3h1v-4"></path>
+                            </svg></a>
+                        <a href="https://github.com/bugventure/jsen"><i class="fa fa-github"></i></a>
+                    </div>
+                </div>
+            </nav>
+        </header><!--//header-->
 
-validate({ username: 'john' });     // true
-validate({ username: 'jim' });      // false</code></pre>
-                            <a class="run-code btn btn-primary" href="https://jsbin.com/memexi/1/edit?html,js,console">Run in JS Bin</a>
+        <div class="doc-wrapper">
+            <div class="container doc-body">
+                <div class="doc-content">
+                    {{ content }}
+                    <div class="bottom-nav row">
+                        {% assign docCount = sorted.size %}
+                        {% assign prevIndex = page.index | minus: 2 | modulo: sorted.size %}
+                        {% assign prev = sorted[prevIndex] %}
+                        <div class="col-xs-6">
+                            <a class="btn btn-primary" href="{{ site.url }}{{ prev.url }}">
+                                <i class="fa fa-arrow-left"></i>
+                                Prev<span class="hidden-xs">: {{ prev.title }}</span>
+                            </a>
+                        </div>
+                        {% assign nextIndex = page.index | plus: 1 | modulo: sorted.size %}
+                        {% assign adjustedIndex = nextIndex | minus: 1 %}
+                        {% assign next = sorted[adjustedIndex] %}
+                        <div class="col-xs-6 text-right">
+                            <a class="btn btn-primary" href="{{ site.url }}{{ next.url }}">
+                                Next<span class="hidden-xs">: {{ next.title }}</span>
+                                <i class="fa fa-arrow-right"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
-            </div><!--//container-->
-        </header><!--//header-->
-
-        <div>
-          {{ content }}
+            </div>
         </div>
     </div><!--//page-wrapper-->
 

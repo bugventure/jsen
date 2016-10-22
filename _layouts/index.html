@@ -9,13 +9,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="keywords" content="{{ site.keywords }}">
-    <meta name="description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
+    <meta name="description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description | strip_html }}{% endif %}">
     <meta name="author" content="bugventure">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
 
     <meta property="og:url" content="{{ site.url }}{{ page.url }}">
     <meta property="og:title" content="{% if page.title %} {{ page.title }} | {% endif %}{{ site.title }}">
-    <meta property="og:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
+    <meta property="og:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description | strip_html }}{% endif %}">
     <meta property="og:image" content="{{ site.url }}/assets/images/jsens.png">
     <meta property="og:type" content="website">
 
@@ -98,7 +98,7 @@ validate({ username: 'jim' });  // false</code></pre>
                             </div><!--//icon-holder-->
                             <h3 class="title">Get Started</h3>
                             <p class="intro">Learn how to use JSON Schema to validate JSON</p>
-                            <a class="link" href="{{ site.url }}/docs/"><span></span></a>
+                            <a class="link" href="{{ site.url }}/get-started"><span></span></a>
                         </div><!--//item-inner-->
                     </div><!--//item-->
                     <div class="item item-purple col-md-4 col-sm-6 col-xs-12">

@@ -10,6 +10,7 @@
 /* ======= Base ======= */
 body {
   font-family: 'Open Sans', arial, sans-serif;
+  background: #f9f9fb;
   color: #494d55;
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
@@ -27,9 +28,6 @@ body {
 .page-wrapper:after {
   content: "";
   display: block;
-  height: 50px;
-}
-.footer {
   height: 50px;
 }
 p {
@@ -50,13 +48,11 @@ a:focus {
   text-decoration: none;
 }
 code {
-  background: #222;
-  color: #fff;
-  font-size: 14px;
+  background: #e9e9e9;
+  color: #494d55;
   font-weight: bold;
   font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
   padding: 2px 8px;
-  padding-top: 4px;
   display: inline-block;
 }
 .btn,
@@ -333,6 +329,37 @@ select {
 .branding .text-highlight {
   color: #40babd;
 }
+.body-green .header {
+  padding: 0;
+}
+.body-green .header .navbar-default {
+  background-color: transparent;
+  border: none;
+  margin-bottom: 0;
+}
+.body-green .header .navbar-brand {
+  padding: 0 0 0 15px;
+}
+.body-green .header .navbar-default .navbar-toggle {
+  border: none;
+  padding-top: 12px;
+}
+.body-green .header .navbar-default .navbar-toggle:focus,
+.body-green .header .navbar-default .navbar-toggle:hover {
+  background: transparent;
+}
+.body-green .header .ext-icons > a {
+  font-size: 32px;
+  color: #eee;
+  padding: 5px;
+  line-height: 50px;
+}
+.body-green .header .navbar-nav {
+  margin-top: 0;
+}
+.body-green .branding {
+  margin-bottom: 3px;
+}
 .body-green .branding .text-highlight {
   color: #75c181;
 }
@@ -415,13 +442,13 @@ select {
 }
 /* ======= Doc Styling ======= */
 .doc-wrapper {
-  padding: 45px 0;
-  background: #f9f9fb;
+  padding: 75px 0 45px 0;
 }
 .doc-body {
   position: relative;
 }
-.doc-header {
+.doc-header,
+.body-green .doc-content h1:first-child {
   margin-bottom: 30px;
 }
 .doc-header .doc-title {
@@ -429,7 +456,8 @@ select {
   margin-top: 0;
   font-size: 36px;
 }
-.body-green .doc-header .doc-title {
+.body-green .doc-header .doc-title,
+.body-green .doc-content h1:first-child {
   color: #75c181;
 }
 .body-blue .doc-header .doc-title {
@@ -455,6 +483,9 @@ select {
 }
 .doc-content {
   margin-left: 230px;
+}
+.doc-content .bottom-nav {
+  margin-top: 45px;
 }
 .doc-section {
   padding-top: 15px;
@@ -540,6 +571,7 @@ select {
   margin-top: 30px;
   margin-bottom: 30px;
   position: relative;
+  max-width: 100%;
 }
 .code-block > .run-code {
   position: absolute;
@@ -751,6 +783,16 @@ select {
 .card:hover .mask {
   visibility: visible;
 }
+/* Markdown-rendered Doc Styling */
+.doc-content h2 {
+  margin-top: 60px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #d7d7d7
+}
+.doc-content .highlight {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
 /* Color Schemes */
 .body-green .header {
   border-color: #75c181;
@@ -906,7 +948,8 @@ select {
   text-decoration: none;
   background: none;
 }
-.body-green .doc-sub-menu > li > a:hover {
+.body-green .doc-sub-menu > li > a:hover,
+#main-nav li > a:hover {
   color: #75c181;
 }
 .body-blue .doc-sub-menu > li > a:hover {
@@ -1071,6 +1114,9 @@ select {
 }
 /* Extra small devices (phones, less than 768px) */
 @media (max-width: 767px) {
+  .doc-wrapper {
+    padding-top: 60px;
+  }
   .doc-content {
     margin-left: 0;
   }
@@ -1298,6 +1344,21 @@ select {
 }
 /* Extra small devices (phones, less than 768px) */
 @media (max-width: 767px) {
+  .body-green .header .navbar-collapse {
+    position: fixed;
+    width: 100%;
+    top: 58px;
+    max-height: inherit;
+    background-color: #494d55;
+  }
+  .body-green .header .navbar-collapse li > a {
+    color: #ccc;
+    border-left: 4px solid transparent;
+  }
+  .body-green .header .navbar-collapse li.active > a {
+    background-color: transparent;
+    border-left-color: #75c181;
+  }
   .header .text-right,
   .header .text-left {
     text-align: center !important;
@@ -1308,6 +1369,31 @@ select {
   }
   .cards-section .item-inner {
     padding: 30px 15px;
+  }
+}
+@media (min-width: 768px) {
+  #main-nav {
+    width: 200px;
+    position: absolute;
+    top: 160px;
+    z-index: 9;
+  }
+
+  #main-nav li {
+    float: none;
+    padding: 0;
+  }
+
+  #main-nav li > a {
+    display: block;
+    padding: 5px 15px;
+    border-left: 4px solid transparent;
+  }
+
+  #main-nav li.active > a {
+    color: #75c181;
+    border-left-color: #75c181;
+    background-color: transparent;
   }
 }
 /* Small devices (tablets, 768px and up) */
