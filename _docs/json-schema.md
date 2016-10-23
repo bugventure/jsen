@@ -8,6 +8,7 @@ This document provides a short introduction guide to [JSON Schema](http://json-s
 
 A JSON schema is a JSON object that specifies the type and structure of another JSON object or value. In JavaScript runtime environments, a JSON object can be represented by a JavaScript object literal. This guide uses the terms JSON object and JavaScript object interchangeably. Here are some valid schema objects:
 
+<div class="table-responsive">
 Schema | Matches
 ------ | -------
 `{}` | any value
@@ -16,6 +17,8 @@ Schema | Matches
 `{ type: ['string', 'null'] }` | either a string or `null`
 `{ type: 'object' }` | a JavaScript object
 `{ type: 'array', items: { type: 'string' } }` | an array containing strings
+{: .table .table-striped .table-bordered }
+</div>
 
 A JSON schema describes a JSON object through a set of keywords. These keywords specify the format the target JSON object must fit into.
 
@@ -26,6 +29,7 @@ A schema is a JSON object whose members are `keywords` as specified by the JSON 
 Column `Type` specifies the type of the valid values for this keyword.
 Column `Target Type` specifies the type of the validated JSON object, for which validation applies according to the specified keyword.
 
+<div class="table-responsive">
 Keyword | Type | Target Type | Description
 ------- | ---- | ----------- | -----------
 `type` | `string` `array` | `any` | Defines the primitive type of a JSON object. See [Type Validation](#type-validation).
@@ -56,7 +60,8 @@ Keyword | Type | Target Type | Description
 `oneOf` | `array [of object]` | `any` | JSON value must conform to at most one of the specified schemas. See [Multi Schema Validation & Negation](#multi-schema-validation--negation).
 `not` | `object` | `any` | JSON value must not conform the specified schema. See [Multi Schema Validation & Negation](#multi-schema-validation--negation).
 `$ref` | `string` | `any` | Specifies a reference to a JSON schema a JSON value must conform to. See [Schema Reference Using `$ref`](#schema-reference-using-ref).
-
+{: .table .table-striped .table-bordered }
+</div>
 
 ## Type Validation
 
@@ -148,35 +153,35 @@ Alternatively `additionalProperties` can be an object defining a schema, where e
 
 You can additionally specify `dependencies` in an object schema. There are two types of dependencies:
 
-1. property dependency
+Type 1: property dependency
 
-    ```javascript
-    {
-        type: 'object',             // if `price` is defined, then
-        dependencies: {             // these two must also be defined
-            price: ['unitsInStock', 'quantityPerUnit']
-        }
+```javascript
+{
+    type: 'object',             // if `price` is defined, then
+    dependencies: {             // these two must also be defined
+        price: ['unitsInStock', 'quantityPerUnit']
     }
-    ```
+}
+```
 
-2. schema dependency
+Type 2: schema dependency
 
-    ``` javascript
-    {
-        type: 'object',
-        dependencies: {                     // if `price` is defined,
-            price: {                        // then the object must also
-                type: 'object',             // match the specified schema
-                properties: {
-                    unitsInStock: {
-                        type: 'integer',
-                        minimum: 0
-                    }
+``` javascript
+{
+    type: 'object',
+    dependencies: {                     // if `price` is defined,
+        price: {                        // then the object must also
+            type: 'object',             // match the specified schema
+            properties: {
+                unitsInStock: {
+                    type: 'integer',
+                    minimum: 0
                 }
             }
         }
     }
-    ```
+}
+```
 
 ### `array`
 

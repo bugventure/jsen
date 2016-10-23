@@ -8,6 +8,9 @@ description: >
 safe: true
 repo_url: https://github.com/bugventure/jsen
 url: 'http://bugventure.github.io/jsen'
+markdown: kramdown
+kramdown:
+  parse_block_html: true
 defaults:
   -
     scope:
