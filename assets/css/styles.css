@@ -785,9 +785,14 @@ select {
 }
 /* Markdown-rendered Doc Styling */
 .doc-content h2 {
-  margin-top: 60px;
+  padding-top: 60px;
   padding-bottom: 10px;
   border-bottom: 1px solid #d7d7d7
+}
+.doc-content h3[id],
+.doc-content h4[id] {
+  padding-top: 60px;
+  margin-top: -40px;
 }
 .doc-content .highlight {
   margin-top: 30px;
