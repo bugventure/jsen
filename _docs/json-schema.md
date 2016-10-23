@@ -38,7 +38,7 @@ Keyword | Type | Target Type | Description
 `minLength` | `integer` | `string` | Specifies the minimum required length of a JSON string value.
 `maxLength` | `integer` | `string` | Specifies the maximum required length of a JSON string value.
 `pattern` | `string` | `string` | Specifies the regular expression pattern to match a string JSON value against.
-`format` | `string` | `string` | Specifies the format a valid JSON string value must conform to. See [Format Validation](README.md#format-validation)
+`format` | `string` | `string` | Specifies the format a valid JSON string value must conform to. See [Format Validation](format-validation)
 `minItems` | `integer` | `array` | Specifies the minimum number of items a JSON array must contain.
 `maxItems` | `integer` | `array` | Specifies the maximum number of items a JSON array must contain.
 `additionalItems` | `boolean` | `array` | Specifies whether a JSON array is allowed to have additional items other than specified by the `items` keyword. Default: `true`.
