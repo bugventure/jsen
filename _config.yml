@@ -7,7 +7,7 @@ description: >
   JavaScript engines can optimize. <b>Works both in node and the browser</b>.
 safe: true
 repo_url: https://github.com/bugventure/jsen
-url: 'http://bugventure.github.io/jsen'
+url: 'https://bugventure.github.io/jsen'
 markdown: kramdown
 kramdown:
   parse_block_html: true
