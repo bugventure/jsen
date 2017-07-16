@@ -9,6 +9,8 @@
 
 jsen (JSON Sentinel) validates your JSON objects using [JSON-Schema](http://json-schema.org/documentation.html).
 
+Website: [http://bugventure.github.io/jsen][jsen-web]
+
 ### Table of Contents
 
 <!-- MarkdownTOC -->
@@ -614,7 +616,7 @@ Read [changelog.md](changelog.md)
 
 ## License
 
-MIT
+[MIT](LICENSE)
 
 [jsen-web]: http://bugventure.github.io/jsen
 [jsen-img]: http://bugventure.github.io/jsen/assets/images/jsen.png
