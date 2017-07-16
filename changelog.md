@@ -1,5 +1,8 @@
 ## Changelog
 
+### v0.6.6
+* Fix browser build not updated to latest bits (#82)
+
 ### v0.6.5
 * Fix schema bug with type "integer" and keywords "maximum" and/or "minimum" (#74)
 * Fix broken required field validation when schema contains properties, but no sub-schema for required property (#81)
