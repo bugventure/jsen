@@ -1,7 +1,7 @@
 /*
  * jsen
  * https://github.com/bugventure/jsen
- * v0.6.5
+ * v0.6.6
  *
  * Copyright (c) 2016 Veli Pehlivanov <bugventure@gmail.com>
  * Licensed under the MIT license
