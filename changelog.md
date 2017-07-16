@@ -1,5 +1,9 @@
 ## Changelog
 
+### v0.6.5
+* Fix schema bug with type "integer" and keywords "maximum" and/or "minimum" (#74)
+* Fix broken required field validation when schema contains properties, but no sub-schema for required property (#81)
+
 ### v0.6.4
 * `minLength` and `maxLength` keywords now properly calculate character length of Unicode surrogate pairs (#58)
 * Add support for scope dereferencing with the `id` keyword (#70)
